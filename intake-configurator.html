@@ -646,6 +646,39 @@
       margin-top: 18px;
     }
 
+    .optional-calculator {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fbfaf6;
+      margin-top: 18px;
+      overflow: hidden;
+    }
+
+    .optional-calculator summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 14px 16px;
+      font-weight: 800;
+    }
+
+    .optional-calculator summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .optional-calculator summary span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 3px;
+    }
+
+    .optional-calculator-body {
+      border-top: 1px solid var(--line);
+      padding: 16px;
+      background: var(--white);
+    }
+
     .area-count {
       color: var(--muted);
       margin-bottom: 14px;
@@ -2121,6 +2154,19 @@
       }).format(Math.round(Number(value) || 0));
     }
 
+    function hasImpactCalculatorInput() {
+      return ["peopleCount", "hoursPerWeek", "hourlyRate", "monthlyExceptions", "exceptionCost"]
+        .some((key) => String(state.impact[key] || "").trim());
+    }
+
+    function isImpactQuantified(impact = calculateImpact()) {
+      return Number(impact.annualLoss) > 0;
+    }
+
+    function formatImpactCurrency(value, impact = calculateImpact()) {
+      return isImpactQuantified(impact) ? formatCurrency(value) : "Zatím nevyčísleno";
+    }
+
     function monthsUntil(dateValue) {
       if (!dateValue) return null;
       const date = new Date(`${dateValue}T00:00:00`);
@@ -2909,8 +2955,8 @@
         `Vybrané oblasti: ${areas}`,
         `Deal score: ${score.total}/100`,
         `VELYOS fit: ${fit.label}`,
-        `Roční ztráta / náklad problému: ${formatCurrency(impact.annualLoss)}`,
-        `Potenciál měsíční úspory: ${formatCurrency(impact.monthlySavingsPotential)}`,
+        `Roční ztráta / náklad problému: ${formatImpactCurrency(impact.annualLoss, impact)}`,
+        `Potenciál měsíční úspory: ${formatImpactCurrency(impact.monthlySavingsPotential, impact)}`,
         `Doporučení: ${score.recommendation}`,
         `Doporučený další krok: ${nextStep.label}`,
         "",
@@ -2969,8 +3015,8 @@
         `- Deal score: ${score.total}/100`,
         `- VELYOS fit: ${fit.label}`,
         `- Doporučení: ${score.recommendation}`,
-        `- Roční ztráta / náklad problému: ${formatCurrency(impact.annualLoss)}`,
-        `- Potenciál měsíční úspory: ${formatCurrency(impact.monthlySavingsPotential)}`,
+        `- Roční ztráta / náklad problému: ${formatImpactCurrency(impact.annualLoss, impact)}`,
+        `- Potenciál měsíční úspory: ${formatImpactCurrency(impact.monthlySavingsPotential, impact)}`,
         "",
         "## Rozsah podle matice",
         `- Vybrané oblasti: ${areas}`,
@@ -3070,7 +3116,7 @@
         "",
         `- řešené oblasti: ${areas}`,
         `- hlavní popsaný problém: ${state.impact.currentPain || "dopad ještě doplníme v dalším kroku"}`,
-        `- orientační roční náklad současného stavu: ${formatCurrency(impact.annualLoss)}`,
+        `- orientační roční náklad současného stavu: ${formatImpactCurrency(impact.annualLoss, impact)}`,
         `- doporučený další krok: ${nextStep.label}`,
         `- primární zaměření Velios: ${primaryOffer}`,
         "",
@@ -3091,6 +3137,7 @@
     }
 
     function impactVerificationLabel() {
+      if (!isImpactQuantified()) return "Čísla zatím nejsou vyčíslená";
       return state.impact.unverified ? "Obchodní odhad k ověření ve Fázi 0" : "Potvrzeno podle odpovědí ze schůzky";
     }
 
@@ -3129,8 +3176,8 @@
         `- Co dnes brzdí provoz: ${state.impact.currentPain || "Doplníme v dalším kroku."}`,
         "",
         "## Dopad",
-        `- Orientační roční náklad současného stavu: ${formatCurrency(impact.annualLoss)}`,
-        `- Orientační měsíční potenciál úspory: ${formatCurrency(impact.monthlySavingsPotential)}`,
+        `- Orientační roční náklad současného stavu: ${formatImpactCurrency(impact.annualLoss, impact)}`,
+        `- Orientační měsíční potenciál úspory: ${formatImpactCurrency(impact.monthlySavingsPotential, impact)}`,
         `- Stav čísel: ${impactVerificationLabel()}`,
         "",
         "## Doporučený další krok",
@@ -3230,7 +3277,7 @@
         ["Firma", state.company.name || "Nevyplněno"],
         ["Kontakt", state.company.contactName || "Nevyplněno"],
         ["Rozpočet", budgetLabel(state.bant.budget)],
-        ["Roční dopad", impact.annualLoss ? formatCurrency(impact.annualLoss) : "Nevyplněno"],
+        ["Roční dopad", formatImpactCurrency(impact.annualLoss, impact)],
         ["Termín", formatDate(state.bant.targetDate)],
         ["Oblasti", selectedAreaTitles().length ? selectedAreaTitles().join(", ") : "Nevybráno"],
         ["Skóre", `${score.total}/100`],
@@ -3251,7 +3298,7 @@
       const nextStep = recommendedNextStep(score, risks, impact, calculateDataReadiness());
       document.getElementById("liveExecutiveSummary").innerHTML = `
         <strong>${escapeHtml(company)}</strong>: ${escapeHtml(pain)}.
-        Dopad ${impact.annualLoss ? escapeHtml(formatCurrency(impact.annualLoss)) : "zatím nevyčíslen"}.
+        Dopad ${escapeHtml(formatImpactCurrency(impact.annualLoss, impact).toLowerCase())}.
         Fit: <strong>${escapeHtml(fit.label)}</strong>.
         Další krok: ${escapeHtml(nextStep.label)}
       `;
@@ -3430,50 +3477,60 @@
 
     function renderStep2() {
       const impact = calculateImpact();
+      const calculatorOpen = hasImpactCalculatorInput() ? "open" : "";
       return `
         <h2>Krok 2: Dopad problému</h2>
-        <p class="intro">Vyčísli, kolik času a výjimek současný proces spotřebuje. Výpočet je orientační, ale dá schůzce jasný ekonomický rámec.</p>
-        <div class="grid two">
-          <div>
-            <label for="peopleCount">Počet lidí v procesu</label>
-            <input id="peopleCount" type="number" min="0" value="${escapeHtml(state.impact.peopleCount)}" placeholder="Např. 4">
-          </div>
-          <div>
-            <label for="hoursPerWeek">Hodin týdně na osobu</label>
-            <input id="hoursPerWeek" type="number" min="0" step="0.5" value="${escapeHtml(state.impact.hoursPerWeek)}" placeholder="Např. 6">
-          </div>
-          <div>
-            <label for="hourlyRate">Odhad hodinové sazby / nákladu</label>
-            <input id="hourlyRate" type="number" min="0" value="${escapeHtml(state.impact.hourlyRate)}" placeholder="Např. 700">
-          </div>
-          <div>
-            <label for="monthlyExceptions">Výjimky nebo chyby měsíčně</label>
-            <input id="monthlyExceptions" type="number" min="0" value="${escapeHtml(state.impact.monthlyExceptions)}" placeholder="Např. 12">
-          </div>
-          <div>
-            <label for="exceptionCost">Náklad jedné výjimky / zdržení</label>
-            <input id="exceptionCost" type="number" min="0" value="${escapeHtml(state.impact.exceptionCost)}" placeholder="Např. 2500">
-          </div>
-          <div>
-            <label>Orientační výsledek</label>
-            <div class="metric">
-              <span>Roční ztráta</span>
-              <strong>${formatCurrency(impact.annualLoss)}</strong>
-              <em>Měsíční potenciál úspory: ${formatCurrency(impact.monthlySavingsPotential)}</em>
+        <p class="intro">Nejdřív pojmenuj provozní problém. Čísla doplň jen tehdy, když je klient umí rychle odhadnout.</p>
+
+        <div>
+          <label for="currentPain">Co dnes brzdí provoz</label>
+          <textarea id="currentPain" placeholder="Ruční přepisování, čekání na schválení, chyby ve fakturaci, výpadky, nespokojenost zákazníků...">${escapeHtml(state.impact.currentPain)}</textarea>
+        </div>
+
+        <details class="optional-calculator" ${calculatorOpen}>
+          <summary>
+            Spočítat orientační dopad
+            <span>Volitelné. Použij jen pro rychlý ekonomický rámec schůzky.</span>
+          </summary>
+          <div class="optional-calculator-body">
+            <div class="grid two">
+              <div>
+                <label for="peopleCount">Kolik lidí se to týká</label>
+                <input id="peopleCount" type="number" min="0" value="${escapeHtml(state.impact.peopleCount)}" placeholder="Např. 4">
+              </div>
+              <div>
+                <label for="hoursPerWeek">Hodin týdně na osobu</label>
+                <input id="hoursPerWeek" type="number" min="0" step="0.5" value="${escapeHtml(state.impact.hoursPerWeek)}" placeholder="Např. 6">
+              </div>
+              <div>
+                <label for="hourlyRate">Hodinový náklad</label>
+                <input id="hourlyRate" type="number" min="0" value="${escapeHtml(state.impact.hourlyRate)}" placeholder="Např. 700">
+              </div>
+              <div>
+                <label for="monthlyExceptions">Chyby/výjimky měsíčně</label>
+                <input id="monthlyExceptions" type="number" min="0" value="${escapeHtml(state.impact.monthlyExceptions)}" placeholder="Např. 12">
+              </div>
+              <div>
+                <label for="exceptionCost">Náklad jedné chyby</label>
+                <input id="exceptionCost" type="number" min="0" value="${escapeHtml(state.impact.exceptionCost)}" placeholder="Např. 2500">
+              </div>
+              <div>
+                <label>Orientační výsledek</label>
+                <div class="metric">
+                  <span>Roční ztráta</span>
+                  <strong>${formatImpactCurrency(impact.annualLoss, impact)}</strong>
+                  <em>Měsíční potenciál úspory: ${formatImpactCurrency(impact.monthlySavingsPotential, impact)}</em>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </details>
 
         <div class="section">
           <label class="choice">
             <input id="impactUnverified" type="checkbox" ${state.impact.unverified ? "checked" : ""}>
-            <span><strong>Dopad je obchodní odhad</strong><span>Zaškrtni, pokud klient nechtěl nebo neuměl čísla přesně potvrdit.</span></span>
+            <span><strong>Čísla jsou jen obchodní odhad</strong><span>Zaškrtni, pokud klient nechtěl nebo neuměl čísla přesně potvrdit.</span></span>
           </label>
-        </div>
-
-        <div class="section">
-          <label for="currentPain">Jak se problém projevuje v provozu</label>
-          <textarea id="currentPain" placeholder="Ruční přepisování, čekání na schválení, chyby ve fakturaci, výpadky, nespokojenost zákazníků...">${escapeHtml(state.impact.currentPain)}</textarea>
         </div>
 
         <div class="actions">
@@ -3645,12 +3702,12 @@
           <div class="metric-grid">
             <div class="metric">
               <span>Roční ztráta</span>
-              <strong>${formatCurrency(impact.annualLoss)}</strong>
+              <strong>${formatImpactCurrency(impact.annualLoss, impact)}</strong>
               <em>Ruční práce + výjimky a zdržení.</em>
             </div>
             <div class="metric">
               <span>Potenciál měsíční úspory</span>
-              <strong>${formatCurrency(impact.monthlySavingsPotential)}</strong>
+              <strong>${formatImpactCurrency(impact.monthlySavingsPotential, impact)}</strong>
               <em>Pracovní odhad 55 % obnovitelného dopadu.</em>
             </div>
             <div class="metric">
@@ -3824,12 +3881,12 @@
           <div class="metric-grid">
             <div class="metric">
               <span>Orientační roční náklad</span>
-              <strong>${formatCurrency(impact.annualLoss)}</strong>
+              <strong>${formatImpactCurrency(impact.annualLoss, impact)}</strong>
               <em>${escapeHtml(impactVerificationLabel())}</em>
             </div>
             <div class="metric">
               <span>Potenciál měsíční úspory</span>
-              <strong>${formatCurrency(impact.monthlySavingsPotential)}</strong>
+              <strong>${formatImpactCurrency(impact.monthlySavingsPotential, impact)}</strong>
               <em>Pracovní odhad podle popsaného procesu.</em>
             </div>
             <div class="metric">
@@ -4047,10 +4104,7 @@
 
     function validateStep2() {
       readStep2();
-      if (!state.impact.peopleCount) return "Vyplň počet lidí v procesu.";
-      if (!state.impact.hoursPerWeek) return "Vyplň počet hodin týdně.";
-      if (!state.impact.hourlyRate) return "Vyplň odhad hodinové sazby.";
-      if (!state.impact.currentPain) return "Popiš, jak se problém projevuje v provozu.";
+      if (!state.impact.currentPain) return "Popiš, co dnes brzdí provoz.";
       return "";
     }
 
