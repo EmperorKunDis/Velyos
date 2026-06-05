@@ -1,10 +1,11 @@
 # Velios business strategie
 
-**Verze:** 1.0  
-**Horizont:** prvních 90 dní  
-**Prioritní ICP:** SMB provozní firmy  
-**Hlavní kanál:** founder outbound  
-**Cíl:** 3 prodané Fáze 0  
+**Verze:** 1.1
+**Horizont:** prvních 90 dní
+**Prioritní ICP:** SMB provozní firmy
+**Hlavní kanál:** founder outbound
+**Obchodní kapacita:** founder only
+**Cíl:** 3 prodané Fáze 0
 
 ---
 
@@ -19,6 +20,15 @@ Základní positioning:
 Krátké odlišení:
 
 > Nejsme webové studio ani AI demo tým. Měříme firemní proces, najdeme únik času a dodáme technické řešení, které jde provozovat.
+
+Operační pravidlo pro prvních 90 dní:
+
+> Neškálovat nabídku ani kanály. Founder každý týden vytváří cílený seznam firem, oslovuje je s konkrétní hypotézou provozního problému, vede schůzku přes intake konfigurátor a uzavírá jeden z pěti dalších kroků.
+
+Tržní opora:
+
+- Evropská komise v Digital Decade 2025 pro Česko pojmenovává prostor pro zlepšení firemní adopce datové analytiky, cloudu a AI, zejména u menších firem: https://digital-strategy.ec.europa.eu/en/factpages/czech-republic-2025-digital-decade-country-report
+- OECD rámuje digitalizaci SMB jako cestu ke konkurenceschopnosti, produktivitě a odolnosti: https://www.oecd-ilibrary.org/en/publications/sme-digitalisation-for-competitiveness_197e3077-en.html
 
 ---
 
@@ -91,6 +101,8 @@ Navazující recurring nabídka po implementaci.
 
 Cíl outboundu není hned prodat implementaci. Cíl je dostat se k provoznímu problému, ověřit ICP fit a prodat Fázi 0.
 
+Praktická exekuce je popsaná v `velios-90-day-sales-sprint.md`. Tento dokument je hlavní strategie; sprint dokument je týdenní pracovní nástroj.
+
 90denní cíle:
 
 | Metrika | Cíl |
@@ -101,6 +113,14 @@ Cíl outboundu není hned prodat implementaci. Cíl je dostat se k provoznímu p
 | Prodané Fáze 0 | 3 |
 | Fáze 0 -> implementace | Alespoň 1 |
 | Case study kandidáti | Alespoň 2 |
+
+Kritéria úspěchu po 90 dnech:
+
+- existuje jasný primární subsegment pro další kvartál,
+- je ověřené, že Fázi 0 lze prodat bez dlouhého vzdělávání trhu,
+- vznikly alespoň 2 anonymizované proof briefy,
+- pipeline obsahuje rozhodnutí u všech leadů: diagnostika, rychlá nabídka, doplnit vstupy, nurturing nebo stop,
+- je známý hlavní důvod ztrát a nurturingu.
 
 Týdenní rytmus:
 

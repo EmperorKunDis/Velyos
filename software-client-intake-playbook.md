@@ -224,6 +224,8 @@ Founder outbound pravidlo:
 - cílit na 5-8 intake/discovery schůzek měsíčně,
 - prodat 3 Fáze 0 během 90 dní.
 
+Praktická týdenní exekuce, šablony oslovení, Fáze 0 one-pager, proof brief a pipeline review jsou v dokumentu `velios-90-day-sales-sprint.md`.
+
 Každý aktivně vytvořený lead musí mít v zápisu:
 
 - ICP fit,
