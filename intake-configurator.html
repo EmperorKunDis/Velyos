@@ -1,0 +1,4610 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VELYOS Intake konfigurátor</title>
+  <meta name="theme-color" content="#0B0F19">
+  <style>
+    :root {
+      --velocity-black: #0b0f19;
+      --ivory: #f5f3ee;
+      --gold: #b8935c;
+      --gold-dark: #927144;
+      --orange: #e85d1f;
+      --deep: #1e3a5f;
+      --mist: #8891a3;
+      --white: #ffffff;
+      --bg: #f5f3ee;
+      --panel: #fffefd;
+      --text: #0b0f19;
+      --muted: #687181;
+      --line: #ded8cd;
+      --line-strong: #c6bdae;
+      --accent: #b8935c;
+      --accent-dark: #927144;
+      --danger: #b42318;
+      --warning: #9a5b13;
+      --success: #067647;
+      --soft-blue: #edf2f7;
+      --soft-red: #fff1ed;
+      --soft-yellow: #fbf2df;
+      --soft-green: #ecfdf3;
+      --radius: 6px;
+      --shadow: 0 18px 46px rgba(11, 15, 25, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(232, 93, 31, 0.08), transparent 32rem),
+        linear-gradient(180deg, #fffefd 0%, var(--bg) 42%);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+      padding: 18px;
+      border: 1px solid rgba(11, 15, 25, 0.10);
+      border-radius: 10px;
+      background: rgba(255, 254, 253, 0.86);
+      box-shadow: 0 10px 30px rgba(11, 15, 25, 0.06);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand-lockup {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .wordmark {
+      display: inline-flex;
+      align-items: baseline;
+      color: var(--velocity-black);
+      font-weight: 800;
+      font-size: 30px;
+      line-height: 1;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .wordmark .os {
+      color: var(--orange);
+    }
+
+    .brand-divider {
+      width: 1px;
+      height: 42px;
+      background: var(--line);
+    }
+
+    .brand-meta {
+      display: grid;
+      gap: 3px;
+    }
+
+    .eyebrow {
+      color: var(--gold-dark);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    h1 {
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    h3 {
+      font-size: 17px;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      max-width: 760px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--deep);
+      background: #fbf8f1;
+      white-space: nowrap;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .meeting-toggle {
+      min-height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 12px;
+      background: var(--white);
+      color: var(--velocity-black);
+      font-size: 14px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .meeting-toggle.active {
+      border-color: var(--velocity-black);
+      background: var(--velocity-black);
+      color: var(--ivory);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .main-panel {
+      padding: 24px;
+    }
+
+    .side-panel {
+      padding: 16px;
+      position: sticky;
+      top: 16px;
+    }
+
+    .progress {
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .progress-track {
+      height: 6px;
+      border-radius: 999px;
+      background: #e7dfd1;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 25%;
+      background: linear-gradient(90deg, var(--gold), var(--orange));
+      transition: width 180ms ease;
+    }
+
+    .step-label {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .stepper {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .step-item {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 9px;
+      background: #fbfaf6;
+      color: var(--muted);
+      font-size: 12px;
+      min-height: 54px;
+    }
+
+    .step-item strong {
+      display: block;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .step-item.active {
+      border-color: var(--gold);
+      background: #fff8eb;
+      box-shadow: inset 0 0 0 1px rgba(184, 147, 92, 0.25);
+    }
+
+    .step-item.done strong {
+      color: var(--success);
+    }
+
+    .intro {
+      margin: 0 0 18px;
+      color: var(--muted);
+    }
+
+    .meeting-instruction {
+      margin: 0 0 18px;
+      border: 1px solid #ecd8b8;
+      border-left: 4px solid var(--orange);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      background: #fff8eb;
+      color: #4a3b2b;
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .hint {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 400;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    textarea,
+    select {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      background: var(--white);
+      color: var(--text);
+      padding: 9px 11px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 92px;
+      resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(184, 147, 92, 0.18);
+    }
+
+    input[type="radio"],
+    input[type="checkbox"] {
+      accent-color: var(--orange);
+    }
+
+    .choice-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .choice-grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .choice {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      background: var(--white);
+      min-height: 58px;
+      transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    }
+
+    .choice:hover {
+      border-color: var(--accent);
+      box-shadow: 0 10px 24px rgba(11, 15, 25, 0.06);
+      transform: translateY(-1px);
+    }
+
+    .choice:has(input:checked) {
+      border-color: var(--gold);
+      background: #fff8eb;
+      box-shadow: inset 0 0 0 1px rgba(184, 147, 92, 0.30);
+    }
+
+    .choice input {
+      margin-top: 4px;
+      flex: 0 0 auto;
+    }
+
+    .choice strong {
+      display: block;
+      line-height: 1.3;
+    }
+
+    .choice span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    .signal-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .signal-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      background: var(--white);
+    }
+
+    .signal-card strong {
+      display: block;
+      line-height: 1.3;
+    }
+
+    .signal-card span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .signal-card.active {
+      border-color: var(--gold);
+      background: #fff8eb;
+      box-shadow: inset 0 0 0 1px rgba(184, 147, 92, 0.25);
+    }
+
+    .signal-actions {
+      display: inline-grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      overflow: hidden;
+      min-width: 124px;
+    }
+
+    .signal-actions button {
+      border: 0;
+      background: var(--white);
+      padding: 8px 10px;
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .signal-actions button.active {
+      background: var(--orange);
+      color: var(--white);
+    }
+
+    .auto-note {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .toggle {
+      display: inline-grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      overflow: hidden;
+      width: 220px;
+      max-width: 100%;
+    }
+
+    .toggle button {
+      border: 0;
+      background: var(--white);
+      padding: 10px 12px;
+      color: var(--text);
+    }
+
+    .toggle button.active {
+      background: var(--velocity-black);
+      color: var(--ivory);
+      font-weight: 700;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .btn {
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      min-height: 42px;
+      padding: 9px 14px;
+      background: var(--white);
+      color: var(--text);
+      font-weight: 700;
+      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .btn:hover {
+      border-color: var(--gold);
+      transform: translateY(-1px);
+    }
+
+    .btn.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--velocity-black);
+    }
+
+    .btn.primary:hover {
+      background: var(--accent-dark);
+      color: var(--white);
+    }
+
+    .btn.danger {
+      color: var(--danger);
+      border-color: #f2b8b5;
+      background: #fff;
+    }
+
+    .btn.ghost {
+      border-color: transparent;
+      color: var(--muted);
+      background: transparent;
+    }
+
+    .error {
+      display: none;
+      margin: 0 0 14px;
+      border: 1px solid #f2b8b5;
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      color: var(--danger);
+      background: var(--soft-red);
+    }
+
+    .error.visible {
+      display: block;
+    }
+
+    .error.info {
+      color: var(--success);
+      border-color: #abefc6;
+      background: var(--soft-green);
+    }
+
+    .summary-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .summary-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .summary-list strong {
+      color: var(--text);
+      text-align: right;
+    }
+
+    .live-summary {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .live-summary strong {
+      color: var(--text);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .status-badge.draft {
+      color: var(--deep);
+      background: var(--soft-blue);
+    }
+
+    .status-badge.completed,
+    .status-badge.handoff_ready {
+      color: var(--success);
+      background: var(--soft-green);
+    }
+
+    .saved-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .saved-item {
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--white);
+      padding: 9px 10px;
+      transition: border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .saved-item:hover {
+      border-color: var(--gold);
+      box-shadow: 0 8px 18px rgba(11, 15, 25, 0.06);
+    }
+
+    .saved-item strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .saved-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .section {
+      border-top: 1px solid var(--line);
+      padding-top: 18px;
+      margin-top: 18px;
+    }
+
+    .area-count {
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 16px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 9px;
+      color: var(--muted);
+      background: #fbfaf6;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .chip.active {
+      color: var(--velocity-black);
+      border-color: var(--gold);
+      background: #fff8eb;
+    }
+
+    .diagnostic-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+      background: #fbfaf6;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      background: var(--white);
+      min-height: 96px;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 24px;
+      line-height: 1.15;
+    }
+
+    .metric em {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 13px;
+      font-style: normal;
+    }
+
+    .output-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .output-mode-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      background: #fbfaf6;
+    }
+
+    .output-mode-actions p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .client-summary-panel {
+      display: grid;
+      gap: 16px;
+    }
+
+    .client-summary-hero {
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--gold);
+      border-radius: var(--radius);
+      padding: 16px;
+      background: #fbfaf6;
+    }
+
+    .client-summary-hero p {
+      margin: 8px 0 0;
+      color: var(--muted);
+    }
+
+    .score-card {
+      display: grid;
+      grid-template-columns: 170px minmax(0, 1fr);
+      gap: 18px;
+      align-items: center;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--white);
+    }
+
+    .score-number {
+      display: grid;
+      place-items: center;
+      width: 150px;
+      height: 150px;
+      border-radius: 999px;
+      border: 12px solid #f5e8cf;
+      color: var(--orange);
+      font-size: 42px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .badge.success {
+      color: var(--success);
+      background: var(--soft-green);
+    }
+
+    .badge.warning {
+      color: var(--warning);
+      background: var(--soft-yellow);
+    }
+
+    .badge.danger {
+      color: var(--danger);
+      background: var(--soft-red);
+    }
+
+    .badge.neutral {
+      color: var(--deep);
+      background: var(--soft-blue);
+    }
+
+    .fit-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .radar-grid,
+    .timeline {
+      display: grid;
+      gap: 10px;
+    }
+
+    .radar-item,
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 140px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      background: var(--white);
+    }
+
+    .risk-meter {
+      height: 8px;
+      border-radius: 999px;
+      background: #ece5d8;
+      overflow: hidden;
+      margin: 6px 0;
+    }
+
+    .risk-meter span {
+      display: block;
+      height: 100%;
+      background: var(--success);
+    }
+
+    .risk-meter.medium span {
+      background: var(--warning);
+    }
+
+    .risk-meter.high span {
+      background: var(--danger);
+    }
+
+    .phase-zero {
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--gold);
+      border-radius: var(--radius);
+      padding: 14px;
+      background: #fbfaf6;
+    }
+
+    .decision-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .decision-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      background: var(--white);
+      min-height: 116px;
+    }
+
+    .decision-card.active {
+      border-color: var(--gold);
+      background: #fff8eb;
+      box-shadow: inset 0 0 0 1px rgba(184, 147, 92, 0.25);
+    }
+
+    .decision-card strong,
+    .decision-card span,
+    .decision-card em {
+      display: block;
+    }
+
+    .decision-card span {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .decision-card em {
+      margin-top: 8px;
+      color: var(--gold-dark);
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .client-output textarea {
+      min-height: 320px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--white);
+    }
+
+    th,
+    td {
+      text-align: left;
+      vertical-align: top;
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    th {
+      background: #f8f4eb;
+      font-size: 14px;
+    }
+
+    .role-cell {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .brief {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--white);
+      overflow: hidden;
+    }
+
+    .brief-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      background: #f8f4eb;
+    }
+
+    .brief textarea {
+      display: block;
+      width: 100%;
+      min-height: 260px;
+      border: 0;
+      border-radius: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.45;
+      background: var(--white);
+    }
+
+    .risk-list {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: var(--warning);
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 0;
+    }
+
+    .guide-fab {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 9999;
+      min-height: 44px;
+      border: 1px solid rgba(245, 243, 238, 0.26);
+      border-radius: 999px;
+      padding: 10px 16px;
+      background: var(--velocity-black);
+      color: var(--ivory);
+      box-shadow: 0 16px 36px rgba(11, 15, 25, 0.28);
+      font-size: 14px;
+      font-weight: 800;
+      white-space: nowrap;
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    .guide-fab:hover {
+      background: #151c2d;
+      box-shadow: 0 18px 42px rgba(11, 15, 25, 0.34);
+      transform: translateY(-1px);
+    }
+
+    .guide-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      background: rgba(11, 15, 25, 0.85);
+      opacity: 0;
+      transition: opacity 180ms ease;
+    }
+
+    .guide-overlay.visible {
+      display: flex;
+    }
+
+    .guide-overlay.open {
+      opacity: 1;
+    }
+
+    .guide-modal {
+      width: min(560px, 100%);
+      max-height: min(82vh, 760px);
+      overflow: hidden;
+      border: 1px solid rgba(245, 243, 238, 0.14);
+      border-radius: 8px;
+      background: var(--ivory);
+      color: var(--velocity-black);
+      box-shadow: 0 28px 90px rgba(0, 0, 0, 0.36);
+      transform: translateY(16px);
+      transition: transform 180ms ease;
+    }
+
+    .guide-overlay.open .guide-modal {
+      transform: translateY(0);
+    }
+
+    .guide-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 18px 12px;
+      border-bottom: 1px solid rgba(11, 15, 25, 0.12);
+      background: #fffefd;
+    }
+
+    .guide-kicker {
+      display: block;
+      color: var(--orange);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+    }
+
+    .guide-title {
+      margin: 3px 0 0;
+      font-size: 20px;
+    }
+
+    .guide-close {
+      display: grid;
+      place-items: center;
+      flex: 0 0 34px;
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--white);
+      color: var(--velocity-black);
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .guide-body {
+      max-height: calc(min(82vh, 760px) - 72px);
+      overflow: auto;
+      padding: 16px 18px 20px;
+    }
+
+    .guide-section {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .guide-section:first-child {
+      margin-top: 0;
+    }
+
+    .guide-section h4 {
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .guide-section p,
+    .guide-section ul {
+      margin: 0;
+      color: #384152;
+    }
+
+    .guide-section ul {
+      padding-left: 19px;
+    }
+
+    .guide-script {
+      border-left: 3px solid var(--orange);
+      padding: 10px 12px;
+      background: #fff8eb;
+      color: #4a3b2b;
+      font-style: italic;
+    }
+
+    .guide-red-flags {
+      display: grid;
+      gap: 8px;
+    }
+
+    .guide-red-flag {
+      border: 1px solid #f2b8b5;
+      border-left: 4px solid var(--danger);
+      border-radius: var(--radius);
+      padding: 9px 10px;
+      background: var(--soft-red);
+      color: #7a271a;
+      font-size: 14px;
+    }
+
+    .guide-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .guide-pill {
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+      padding: 7px 11px;
+      background: var(--white);
+      color: var(--velocity-black);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .guide-pill.active {
+      border-color: var(--orange);
+      background: var(--orange);
+      color: var(--white);
+    }
+
+    .guide-table {
+      display: grid;
+      gap: 5px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .guide-table-row {
+      display: grid;
+      grid-template-columns: minmax(86px, 0.72fr) minmax(0, 1.28fr);
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 7px 8px;
+      background: var(--white);
+    }
+
+    .guide-checklist {
+      display: grid;
+      gap: 8px;
+    }
+
+    .guide-checklist label {
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 9px 10px;
+      background: var(--white);
+      color: #384152;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    @media (max-width: 880px) {
+      .app {
+        padding: 16px;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .side-panel {
+        position: static;
+        order: -1;
+      }
+
+      .grid.two,
+      .choice-grid.two,
+      .metric-grid,
+      .fit-grid,
+      .decision-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .score-card {
+        grid-template-columns: 1fr;
+      }
+
+      .radar-item,
+      .timeline-item {
+        grid-template-columns: 1fr;
+      }
+
+      .signal-card {
+        grid-template-columns: 1fr;
+      }
+
+      .stepper {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 520px) {
+      h1 {
+        font-size: 23px;
+      }
+
+      .topbar {
+        display: block;
+      }
+
+      .brand-lockup {
+        align-items: flex-start;
+      }
+
+      .brand-divider {
+        display: none;
+      }
+
+      .status-pill {
+        margin-top: 12px;
+      }
+
+      .topbar-actions {
+        justify-content: flex-start;
+        margin-top: 12px;
+      }
+
+      .main-panel {
+        padding: 16px;
+      }
+
+      .actions .btn {
+        width: 100%;
+      }
+
+      .score-number {
+        width: 130px;
+        height: 130px;
+      }
+
+      .guide-fab {
+        right: 14px;
+        bottom: 14px;
+        max-width: calc(100vw - 28px);
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .guide-overlay {
+        padding: 12px;
+      }
+
+      .guide-modal {
+        max-height: 88vh;
+      }
+
+      .guide-body {
+        max-height: calc(88vh - 72px);
+      }
+    }
+
+    body.meeting-mode {
+      background: var(--velocity-black);
+    }
+
+    body.meeting-mode .app {
+      width: min(1280px, calc(100vw - 48px));
+      max-width: none;
+      padding: 22px 0 34px;
+    }
+
+    body.meeting-mode .topbar {
+      margin-bottom: 16px;
+      padding: 14px 18px;
+      border-color: rgba(245, 243, 238, 0.16);
+      border-radius: 8px;
+      background: #0b0f19;
+      color: var(--ivory);
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+
+    body.meeting-mode .brand-lockup {
+      gap: 12px;
+    }
+
+    body.meeting-mode .wordmark {
+      font-size: 27px;
+    }
+
+    body.meeting-mode .brand-divider {
+      height: 34px;
+      background: rgba(245, 243, 238, 0.22);
+    }
+
+    body.meeting-mode .eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+    }
+
+    body.meeting-mode h1 {
+      font-size: 28px;
+    }
+
+    body.meeting-mode .subtitle {
+      max-width: 640px;
+      margin-top: 4px;
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    body.meeting-mode .wordmark,
+    body.meeting-mode h1 {
+      color: var(--ivory);
+    }
+
+    body.meeting-mode .subtitle,
+    body.meeting-mode .eyebrow {
+      color: #d8c4a1;
+    }
+
+    body.meeting-mode .layout {
+      grid-template-columns: 1fr;
+    }
+
+    body.meeting-mode .side-panel {
+      display: none;
+    }
+
+    body.meeting-mode .panel {
+      border-color: #d6cfc3;
+      border-radius: 8px;
+      box-shadow: 0 18px 52px rgba(0, 0, 0, 0.22);
+    }
+
+    body.meeting-mode .main-panel {
+      padding: 24px;
+    }
+
+    body.meeting-mode .meeting-instruction {
+      min-height: 52px;
+      padding: 14px 16px;
+      font-size: 17px;
+    }
+
+    body.meeting-mode .progress {
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+    }
+
+    body.meeting-mode .progress-top {
+      font-size: 14px;
+    }
+
+    body.meeting-mode .stepper {
+      gap: 10px;
+    }
+
+    body.meeting-mode .step-item {
+      min-height: 66px;
+      padding: 12px;
+    }
+
+    body.meeting-mode .step-item strong {
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    body.meeting-mode .intro {
+      max-width: 940px;
+      font-size: 16px;
+      line-height: 1.45;
+    }
+
+    body.meeting-mode h2 {
+      font-size: 24px;
+    }
+
+    body.meeting-mode label,
+    body.meeting-mode input,
+    body.meeting-mode textarea,
+    body.meeting-mode select,
+    body.meeting-mode .choice strong,
+    body.meeting-mode .btn {
+      font-size: 17px;
+    }
+
+    body.meeting-mode input,
+    body.meeting-mode textarea,
+    body.meeting-mode select {
+      min-height: 54px;
+      padding: 12px 14px;
+    }
+
+    body.meeting-mode textarea {
+      min-height: 120px;
+    }
+
+    body.meeting-mode .btn,
+    body.meeting-mode .meeting-toggle {
+      min-height: 52px;
+      padding: 12px 16px;
+    }
+
+    body.meeting-mode .choice,
+    body.meeting-mode .signal-card,
+    body.meeting-mode .metric,
+    body.meeting-mode .decision-card {
+      padding: 16px;
+    }
+
+    body.meeting-mode .choice {
+      min-height: 78px;
+    }
+
+    body.meeting-mode .signal-actions {
+      min-width: 164px;
+    }
+
+    body.meeting-mode .signal-actions button {
+      min-height: 48px;
+      padding: 12px 14px;
+    }
+
+    body.meeting-mode .status-pill {
+      border-color: rgba(245, 243, 238, 0.22);
+      background: var(--ivory);
+      color: var(--deep);
+    }
+
+    body.meeting-mode .meeting-toggle {
+      border-color: rgba(245, 243, 238, 0.28);
+      background: transparent;
+      color: var(--ivory);
+      box-shadow: none;
+      outline: none;
+    }
+
+    body.meeting-mode .meeting-toggle.active {
+      border-color: var(--orange);
+      background: var(--orange);
+      color: var(--white);
+    }
+
+    body.meeting-mode .meeting-toggle:focus-visible {
+      box-shadow: 0 0 0 3px rgba(232, 93, 31, 0.28);
+    }
+
+    @media (max-width: 880px) {
+      body.meeting-mode .app {
+        width: min(100% - 24px, 1280px);
+        padding-top: 12px;
+      }
+
+      body.meeting-mode .topbar {
+        display: grid;
+        gap: 12px;
+      }
+
+      body.meeting-mode .main-panel {
+        padding: 18px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      body.meeting-mode .wordmark {
+        font-size: 24px;
+      }
+
+      body.meeting-mode h1 {
+        font-size: 23px;
+      }
+
+      body.meeting-mode .subtitle {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand-lockup">
+        <div class="wordmark" aria-label="VELYOS"><span>VELY</span><span class="os">OS</span></div>
+        <div class="brand-divider" aria-hidden="true"></div>
+        <div class="brand-meta">
+          <span class="eyebrow">The Velocity Operating System.</span>
+          <h1>B2B intake konfigurátor</h1>
+          <p class="subtitle">Kvalifikace leadu, rozhodovací matice a handoff pro tým. Přesně, bez omáčky.</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button class="meeting-toggle" id="demoBtn" type="button">Načíst demo</button>
+        <button class="meeting-toggle" id="meetingModeBtn" type="button" aria-pressed="false">Meeting Mode</button>
+        <span class="status-pill" id="syncStatus">Lokální režim</span>
+      </div>
+    </header>
+
+    <div class="layout">
+      <main class="panel main-panel">
+        <div class="progress" aria-label="Průběh formuláře">
+          <div class="progress-top">
+            <span class="step-label" id="stepLabel">Krok 1 ze 4</span>
+            <span id="stepName">BANT kvalifikace</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="stepper" id="stepper"></div>
+        </div>
+
+        <div id="errorBox" class="error" role="alert"></div>
+        <p class="meeting-instruction">Používej jako průvodce rozhovorem. Nečti otázky mechanicky. Zapisuj krátké poznámky.</p>
+        <section id="stepRoot"></section>
+      </main>
+
+      <aside class="panel side-panel" aria-label="Souhrn a uložené intaky">
+        <h3>Aktuální intake</h3>
+        <ul class="summary-list" id="miniSummary"></ul>
+
+        <div class="section">
+          <h3>Live Executive Summary</h3>
+          <p class="live-summary" id="liveExecutiveSummary"></p>
+        </div>
+
+        <div class="section">
+          <h3>Rozpracované / uložené</h3>
+          <p class="empty">Ukládá se zatím jen v tomto prohlížeči. Později stejný seznam načte kancelářský server.</p>
+          <div class="saved-list" id="savedList"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <button class="guide-fab" id="guideOpenBtn" type="button" aria-haspopup="dialog" aria-controls="guideOverlay">Průvodce · BANT</button>
+  <div class="guide-overlay" id="guideOverlay" aria-hidden="true">
+    <section class="guide-modal" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+      <div class="guide-head">
+        <div>
+          <span class="guide-kicker">Interní coaching</span>
+          <h2 class="guide-title" id="guideTitle">Průvodce schůzkou</h2>
+        </div>
+        <button class="guide-close" id="guideCloseBtn" type="button" aria-label="Zavřít průvodce">×</button>
+      </div>
+      <div class="guide-body" id="guideBody"></div>
+    </section>
+  </div>
+
+  <script>
+    "use strict";
+
+    const API_BASE_URL = "";
+    const STORAGE_KEY = "velyos.intake.records.v1";
+    const MIN_TARGET_BUDGET = "100-300k";
+    const MIN_STANDARD_PROJECT_CZK = 100000;
+    const TECHNICAL_DIAGNOSTIC_AREAS = ["automation", "integration", "ai", "internal", "maintenance", "security", "devops"];
+    const primaryOffer = "Automatizace a digitalizace procesů";
+    const diagnosticPackage = {
+      name: "Velios Fáze 0: Procesní a technická diagnostika",
+      price: "15-30k Kč",
+      duration: "3-7 pracovních dnů",
+      outputs: [
+        "Mapa procesu",
+        "Odhad úspory času",
+        "Rizika a otevřené otázky",
+        "Zapojené role",
+        "Technické vstupy",
+        "Scope fáze 1",
+        "Doporučení nabídka / stop"
+      ],
+      useWhen: [
+        "Automatizace, integrace, AI/data, interní systém, DevOps, security nebo maintenance",
+        "Nejasný proces, data, API, technický kontakt nebo vlastník rozhodnutí",
+        "Klient chce závaznou cenu před ověřením rozsahu"
+      ],
+      doNotUseWhen: [
+        "Malý jasný web bez integrací a citlivých dat",
+        "Lead je pod minimem bez strategické referenční hodnoty"
+      ]
+    };
+    const gtmStrategy = {
+      primaryIcp: "SMB provoz",
+      motion: "Founder outbound",
+      ninetyDayGoal: "3 prodané Fáze 0",
+      targetCompanyCount: 100,
+      weeklyOutreachTarget: 30,
+      monthlyMeetingTarget: "5-8 intake/discovery schůzek",
+      implementationOffer: "Pilot automatizace",
+      recurringOffer: "Rozvoj a provoz"
+    };
+
+    const serviceAreas = [
+      {
+        id: "web",
+        number: 1,
+        title: "Web / Frontend",
+        description: "Prezentační web, portál, frontend aplikace.",
+        roles: ["PM", "UX/UI", "Frontend"],
+        questions: [
+          { key: "platformUrl", label: "Současná platforma / URL" },
+          { key: "mainGoal", label: "Hlavní cíl: SEO, konverze, portál, informace" },
+          { key: "contentOwner", label: "Kdo spravuje obsah" }
+        ]
+      },
+      {
+        id: "ux",
+        number: 2,
+        title: "UX/UI / Design",
+        description: "Design systému, prototyp, použitelnost.",
+        roles: ["PM", "UX/UI", "Analyst"],
+        questions: [
+          { key: "brandAssets", label: "Existují brand podklady" },
+          { key: "endUsers", label: "Kdo jsou koncoví uživatelé: interní / externí" },
+          { key: "research", label: "Proběhl UX výzkum nebo testování" }
+        ]
+      },
+      {
+        id: "backend",
+        number: 3,
+        title: "Backend / Databáze",
+        description: "API, databáze, role, datová logika.",
+        roles: ["PM", "Backend", "Analyst"],
+        questions: [
+          { key: "stack", label: "Existující technologický stack" },
+          { key: "dataVolume", label: "Objem dat: řádky / GB / záznamy" },
+          { key: "sla", label: "SLA, dostupnost, zálohy nebo reporting" }
+        ]
+      },
+      {
+        id: "internal",
+        number: 4,
+        title: "Interní systém (CRM, ERP...)",
+        description: "Interní workflow, evidence, schvalování.",
+        roles: ["PM", "Analyst", "Backend", "QA"],
+        questions: [
+          { key: "users", label: "Kolik interních uživatelů systém používá" },
+          { key: "replacedProcess", label: "Jaký proces systém nahrazuje" },
+          { key: "itContact", label: "Kdo je IT kontakt na straně klienta" }
+        ]
+      },
+      {
+        id: "automation",
+        number: 5,
+        title: "Automatizace procesů",
+        description: "Ruční práce, pravidla, kontroly, workflow.",
+        roles: ["Analyst", "Backend"],
+        questions: [
+          { key: "process", label: "Který přesný proces se má automatizovat" },
+          { key: "hours", label: "Kolik hodin týdně dnes zabere" },
+          { key: "errors", label: "Kde vznikají chyby nebo výjimky" }
+        ]
+      },
+      {
+        id: "integration",
+        number: 6,
+        title: "API / Účetní integrace",
+        description: "ERP, CRM, účetnictví, synchronizace dat.",
+        roles: ["Analyst", "Backend"],
+        questions: [
+          { key: "systems", label: "Které systémy se mají propojit" },
+          { key: "apiDocs", label: "Je dostupná API dokumentace nebo sandbox" },
+          { key: "sync", label: "Frekvence synchronizace a směr toku dat" }
+        ]
+      },
+      {
+        id: "mobile",
+        number: 7,
+        title: "Mobilní aplikace",
+        description: "iOS, Android, interní nebo zákaznická appka.",
+        roles: ["PM", "UX/UI", "Mobile", "Backend", "QA"],
+        questions: [
+          { key: "platforms", label: "iOS, Android nebo obě platformy" },
+          { key: "audience", label: "Interní nebo zákaznická aplikace" },
+          { key: "offline", label: "Je potřeba offline režim" }
+        ]
+      },
+      {
+        id: "ai",
+        number: 8,
+        title: "AI / Data",
+        description: "AI funkce, reporting, predikce, datová analýza.",
+        roles: ["Analyst", "AI/Data"],
+        questions: [
+          { key: "problem", label: "Jaký konkrétní problém má AI řešit" },
+          { key: "historicalData", label: "Jsou dostupná historická data" },
+          { key: "consumer", label: "Kdo používá výstup AI nebo analýzy" }
+        ]
+      },
+      {
+        id: "devops",
+        number: 9,
+        title: "Cloud / DevOps",
+        description: "Hosting, CI/CD, monitoring, provoz.",
+        roles: ["DevOps", "Backend"],
+        questions: [
+          { key: "hosting", label: "Současný hosting: on-premise, VPS, cloud" },
+          { key: "cicd", label: "Existuje CI/CD nebo release proces" },
+          { key: "sla", label: "SLA, monitoring, RTO/RPO nebo incidenty" }
+        ]
+      },
+      {
+        id: "security",
+        number: 10,
+        title: "Bezpečnost / Compliance",
+        description: "GDPR, NIS2, audit, role, citlivá data.",
+        roles: ["Security", "Analyst", "PM"],
+        questions: [
+          { key: "personalData", label: "Zpracovávají se osobní údaje občanů EU" },
+          { key: "regulations", label: "Relevantní regulace: GDPR, HIPAA, NIS2, jiné" },
+          { key: "audit", label: "Kdy proběhl poslední bezpečnostní audit" }
+        ]
+      },
+      {
+        id: "maintenance",
+        number: 11,
+        title: "Údržba a dlouhodobá podpora",
+        description: "Převzetí systému, SLA, backlog, incidenty.",
+        roles: ["PM", "Tech Lead", "DevOps"],
+        questions: [
+          { key: "system", label: "Jaký existující systém se má podporovat" },
+          { key: "downtimeCost", label: "Kolik stojí hodina výpadku" },
+          { key: "supportType", label: "Je potřeba rozvoj, údržba, nebo oboje" }
+        ]
+      }
+    ];
+
+    const allRoles = ["PM", "Analyst", "UX/UI", "Frontend", "Backend", "DevOps", "QA", "Security", "AI/Data", "Mobile", "Tech Lead"];
+    const decisionSignals = [
+      {
+        id: "public_web",
+        question: "Řešíte veřejný web, landing page, portál nebo prezentaci?",
+        yes: "Zapnout Web / Frontend a ověřit UX/UI.",
+        no: "Web větev vypnout.",
+        areas: ["web", "ux"]
+      },
+      {
+        id: "has_ui",
+        question: "Má řešení obrazovky, formuláře, dashboard nebo zákaznické rozhraní?",
+        yes: "Zapnout UX/UI, Frontend nebo Mobile podle kanálu.",
+        no: "UI role nezapojovat.",
+        areas: ["ux", "web"]
+      },
+      {
+        id: "manual_process",
+        question: "Nahrazujeme Excel, e-maily, papír nebo ruční schvalování?",
+        yes: "Zapnout Interní systém a Automatizaci.",
+        no: "Nepředpokládat interní systém.",
+        areas: ["internal", "automation"]
+      },
+      {
+        id: "data_retyping",
+        question: "Přepisují lidé data mezi systémy?",
+        yes: "Zapnout Automatizaci a Integrace.",
+        no: "Integrace jen při konkrétním systému.",
+        areas: ["automation", "integration"]
+      },
+      {
+        id: "systems_to_connect",
+        question: "Má se propojit účetnictví, ERP, CRM, sklad, e-shop nebo API?",
+        yes: "Zapnout Integrace, Backend a podle rizika DevOps.",
+        no: "Backend jen pokud vzniká vlastní logika.",
+        areas: ["integration", "backend"]
+      },
+      {
+        id: "business_logic",
+        question: "Má systém ukládat role, data, workflow nebo pravidla?",
+        yes: "Zapnout Backend / Databáze.",
+        no: "Backend nezapojovat u čistého webu.",
+        areas: ["backend"]
+      },
+      {
+        id: "field_mobile",
+        question: "Má se používat v terénu nebo nativně v mobilu?",
+        yes: "Zapnout Mobile, UX/UI, Backend, QA.",
+        no: "Mobile větev vypnout.",
+        areas: ["mobile", "ux", "backend"]
+      },
+      {
+        id: "ai_data",
+        question: "Chce klient AI agenta, predikce, reporting nebo práci s daty?",
+        yes: "Zapnout AI/Data, ověřit data a human-in-the-loop.",
+        no: "AI tým nezapojovat.",
+        areas: ["ai"]
+      },
+      {
+        id: "production_ops",
+        question: "Bude to produkčně běžet, vyžaduje SLA, monitoring nebo cloud?",
+        yes: "Zapnout DevOps.",
+        no: "DevOps jen pokud existuje provozní riziko.",
+        areas: ["devops"]
+      },
+      {
+        id: "sensitive_data",
+        question: "Jsou ve hře osobní, zdravotní, finanční, HR nebo regulovaná data?",
+        yes: "Zapnout Security/Compliance před nabídkou.",
+        no: "Security jen při dalších rizikových signálech.",
+        areas: ["security"]
+      },
+      {
+        id: "takeover",
+        question: "Přebíráme existující systém nebo podporu?",
+        yes: "Zapnout Maintenance, Tech Lead, DevOps, QA.",
+        no: "Maintenance větev vypnout.",
+        areas: ["maintenance", "devops"]
+      }
+    ];
+    const stepNames = ["BANT kvalifikace", "Dopad problému", "Výběr oblastí", "Dynamická diagnostika", "Vyhodnocení a handoff"];
+
+    const defaultState = () => ({
+      step: 1,
+      diagnosticIndex: 0,
+      currentId: createId(),
+      currentStatus: "draft",
+      owner: "",
+      source: "",
+      strategicExceptionReason: "",
+      leadSourceScore: 10,
+      meetingContext: {
+        mode: "onsite",
+        customerSegment: "SMB služby/provoz",
+        initiatedBy: "",
+        attendees: "",
+        meetingGoal: ""
+      },
+      company: {
+        name: "",
+        contactName: "",
+        contactRole: ""
+      },
+      decisionMap: {
+        economicBuyer: "",
+        technicalBuyer: "",
+        user: "",
+        blocker: "",
+        champion: ""
+      },
+      bant: {
+        budget: "",
+        targetDate: "",
+        decisionMakerAccess: null
+      },
+      impact: {
+        peopleCount: "",
+        hoursPerWeek: "",
+        hourlyRate: "",
+        monthlyExceptions: "",
+        exceptionCost: "",
+        currentPain: "",
+        unverified: false
+      },
+      selectedAreas: [],
+      selectedSignals: [],
+      diagnostics: {}
+    });
+
+    let state = defaultState();
+    let recordsCache = [];
+    let outputMode = "internal";
+    let step1Sub = "a";
+    let lastRenderedStep = state.step;
+
+    const leadSourceOptions = [
+      { label: "Referral od existujícího zákazníka", score: 20 },
+      { label: "Inbound z webu", score: 16 },
+      { label: "Cold outreach (my)", score: 10 },
+      { label: "Event / konference", score: 12 },
+      { label: "Doporučení partnera", score: 14 },
+      { label: "Jiné", score: 8 }
+    ];
+
+    function demoState() {
+      const demo = defaultState();
+      demo.step = 5;
+      demo.diagnosticIndex = 2;
+      demo.currentStatus = "handoff_ready";
+      demo.owner = "Velios obchod";
+      demo.source = "Founder outbound";
+      demo.leadSourceScore = 16;
+      demo.meetingContext = {
+        mode: "onsite",
+        customerSegment: "SMB provozní servisní firma, 45 lidí",
+        initiatedBy: "Outbound s hypotézou ručního přepisování mezi servisem, skladem a účetnictvím",
+        attendees: "Jednatel, provozní manažer, vedoucí skladu, externí IT dodavatel",
+        meetingGoal: "Ověřit dopad ručního procesu a domluvit Fázi 0 pro procesní a technickou diagnostiku"
+      };
+      demo.company = {
+        name: "ProvozPlus Servis s.r.o.",
+        contactName: "Petr Novák",
+        contactRole: "Jednatel"
+      };
+      demo.decisionMap = {
+        economicBuyer: "Petr Novák, jednatel",
+        technicalBuyer: "Externí IT dodavatel + vedoucí skladu",
+        user: "Dispečeři, servisní technici, sklad, účetní",
+        blocker: "",
+        champion: "Provozní manažerka Jana Dvořáková"
+      };
+      demo.bant = {
+        budget: "100-300k",
+        targetDate: "2026-09-30",
+        decisionMakerAccess: true
+      };
+      demo.impact = {
+        peopleCount: "6",
+        hoursPerWeek: "7",
+        hourlyRate: "650",
+        monthlyExceptions: "18",
+        exceptionCost: "1800",
+        currentPain: "Dispečeři ručně přepisují servisní požadavky z e-mailu do tabulek, sklad ověřuje dostupnost dílů mimo systém a účetní doplňuje podklady k fakturaci zpětně. Vznikají zdržení zakázek, chyby v předávkách a opakované dotazy zákazníků.",
+        unverified: true
+      };
+      demo.selectedSignals = ["manual_process", "data_retyping", "systems_to_connect", "business_logic", "production_ops"];
+      demo.selectedAreas = ["internal", "automation", "integration", "backend", "devops"];
+      demo.diagnostics = {
+        internal: {
+          answers: {
+            users: "6 interních uživatelů denně, další technici dostávají pokyny v terénu.",
+            replacedProcess: "Excel evidence zakázek, e-mailové předávky, ruční kontrola skladu a ruční podklady pro fakturaci.",
+            itContact: "Externí IT dodavatel je dostupný pro API/exporty a technický handoff."
+          }
+        },
+        automation: {
+          answers: {
+            process: "Přijetí servisního požadavku, kontrola dostupnosti dílů, přiřazení technika a předání podkladů k fakturaci.",
+            hours: "Přibližně 42 hodin týdně napříč dispečinkem, skladem a účetní administrativou.",
+            errors: "Chybné předání zakázky, pozdní informace o skladové dostupnosti, nekompletní fakturační podklady."
+          }
+        },
+        integration: {
+          answers: {
+            systems: "CRM/e-mailová schránka, skladová evidence, účetní systém Pohoda a sdílené Excel tabulky.",
+            apiDocs: "API dokumentace Pohody je dostupná, skladová evidence umí export CSV a dodavatel potvrdil technický kontakt.",
+            sync: "Denní synchronizace skladu a průběžné předání dokončených zakázek do účetnictví; konflikty řeší provozní manažer."
+          }
+        },
+        backend: {
+          answers: {
+            stack: "Současně bez vlastní aplikace, jen tabulky a účetní/skladové systémy.",
+            dataVolume: "Řádově stovky servisních požadavků měsíčně, jednotky tisíc položek skladu.",
+            sla: "Systém má podporovat pracovní dobu, monitoring stačí základní, výpadek nad půl dne blokuje provoz."
+          }
+        },
+        devops: {
+          answers: {
+            hosting: "Preferovaný cloud provoz bez vlastního serveru u klienta.",
+            cicd: "Zatím neexistuje, bude potřeba základní release a rollback režim.",
+            sla: "Monitoring dostupnosti, denní zálohy, incident kontakt na provozního manažera."
+          }
+        }
+      };
+      return demo;
+    }
+
+    const localStorageProvider = {
+      async list() {
+        return readRecords();
+      },
+      async upsert(record) {
+        const records = readRecords();
+        const index = records.findIndex((item) => item.id === record.id);
+        if (index >= 0) {
+          records[index] = record;
+        } else {
+          records.unshift(record);
+        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+        return record;
+      },
+      async get(id) {
+        return readRecords().find((item) => item.id === id) || null;
+      },
+      async remove(id) {
+        const records = readRecords().filter((item) => item.id !== id);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+      }
+    };
+
+    const apiProvider = {
+      async list() {
+        return fetchJson("/api/intakes");
+      },
+      async upsert(record) {
+        const exists = record.id && !record.id.startsWith("local-");
+        return fetchJson(exists ? `/api/intakes/${record.id}` : "/api/intakes", {
+          method: exists ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(record)
+        });
+      },
+      async get(id) {
+        return fetchJson(`/api/intakes/${id}`);
+      },
+      async remove(id) {
+        return fetchJson(`/api/intakes/${id}`, { method: "DELETE" });
+      }
+    };
+
+    const storageProvider = API_BASE_URL ? apiProvider : localStorageProvider;
+
+    function createId() {
+      if (window.crypto && typeof window.crypto.randomUUID === "function") {
+        return window.crypto.randomUUID();
+      }
+      return `local-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+
+    function readRecords() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      } catch (error) {
+        return [];
+      }
+    }
+
+    async function fetchJson(path, options) {
+      const response = await fetch(`${API_BASE_URL}${path}`, options);
+      if (!response.ok) {
+        throw new Error(`Server vrátil chybu ${response.status}`);
+      }
+      return response.json();
+    }
+
+    function areaById(id) {
+      return serviceAreas.find((area) => area.id === id);
+    }
+
+    function selectedAreaTitles() {
+      return state.selectedAreas.map((id) => areaById(id)?.title).filter(Boolean);
+    }
+
+    function signalById(id) {
+      return decisionSignals.find((signal) => signal.id === id);
+    }
+
+    function uniqueValues(values) {
+      return Array.from(new Set(values.filter(Boolean)));
+    }
+
+    function impliedAreaIdsFromSignals(signalIds = state.selectedSignals) {
+      return uniqueValues(signalIds.flatMap((id) => signalById(id)?.areas || []));
+    }
+
+    function selectedSignalTitles() {
+      return state.selectedSignals.map((id) => signalById(id)?.question).filter(Boolean);
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function setError(message) {
+      const box = document.getElementById("errorBox");
+      box.textContent = message || "";
+      box.classList.remove("info");
+      box.classList.toggle("visible", Boolean(message));
+    }
+
+    function setNotice(message) {
+      const box = document.getElementById("errorBox");
+      box.textContent = message || "";
+      box.classList.add("info");
+      box.classList.toggle("visible", Boolean(message));
+    }
+
+    function formatDate(value) {
+      if (!value) return "Nevyplněno";
+      const date = new Date(`${value}T00:00:00`);
+      return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString("cs-CZ");
+    }
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat("cs-CZ", {
+        style: "currency",
+        currency: "CZK",
+        maximumFractionDigits: 0
+      }).format(Math.round(Number(value) || 0));
+    }
+
+    function monthsUntil(dateValue) {
+      if (!dateValue) return null;
+      const date = new Date(`${dateValue}T00:00:00`);
+      if (Number.isNaN(date.getTime())) return null;
+      const now = new Date();
+      return ((date.getFullYear() - now.getFullYear()) * 12) + (date.getMonth() - now.getMonth()) + ((date.getDate() - now.getDate()) / 30);
+    }
+
+    function textContains(value, terms) {
+      const haystack = String(value || "").toLowerCase();
+      return terms.some((term) => haystack.includes(term));
+    }
+
+    function collectDiagnosticText() {
+      return Object.values(state.diagnostics)
+        .flatMap((item) => Object.values(item.answers || {}))
+        .join(" ")
+        .toLowerCase();
+    }
+
+    function calculateScore() {
+      const budgetScore = {
+        "<100k": 5,
+        "100-300k": 10,
+        "300k-1M": 16,
+        "1M+": 20
+      }[state.bant.budget] || 0;
+
+      const months = monthsUntil(state.bant.targetDate);
+      let timelineScore = 0;
+      if (months === null || months < 0) timelineScore = 0;
+      else if (months < 3) timelineScore = 20;
+      else if (months <= 6) timelineScore = 12;
+      else timelineScore = 5;
+
+      const score = {
+        offerFit: state.selectedAreas.length > 0 ? 20 : 0,
+        dealSize: budgetScore,
+        decisionMaker: state.bant.decisionMakerAccess === true ? 20 : 5,
+        timeline: timelineScore,
+        leadSource: clampNumber(state.leadSourceScore, 0, 20)
+      };
+      score.total = score.offerFit + score.dealSize + score.decisionMaker + score.timeline + score.leadSource;
+      score.recommendation = recommendationFor(score.total);
+      return score;
+    }
+
+    function calculateImpact() {
+      const peopleCount = clampNumber(state.impact.peopleCount, 0, 999);
+      const hoursPerWeek = clampNumber(state.impact.hoursPerWeek, 0, 999);
+      const hourlyRate = clampNumber(state.impact.hourlyRate, 0, 99999);
+      const monthlyExceptions = clampNumber(state.impact.monthlyExceptions, 0, 99999);
+      const exceptionCost = clampNumber(state.impact.exceptionCost, 0, 9999999);
+      const weeklyManualCost = peopleCount * hoursPerWeek * hourlyRate;
+      const annualManualCost = weeklyManualCost * 52;
+      const annualExceptionCost = monthlyExceptions * exceptionCost * 12;
+      const annualLoss = annualManualCost + annualExceptionCost;
+      const monthlySavingsPotential = (annualLoss / 12) * 0.55;
+
+      return {
+        peopleCount,
+        hoursPerWeek,
+        hourlyRate,
+        monthlyExceptions,
+        exceptionCost,
+        weeklyManualCost,
+        annualManualCost,
+        annualExceptionCost,
+        annualLoss,
+        monthlySavingsPotential,
+        projectType: projectTypeForImpact(annualLoss)
+      };
+    }
+
+    function projectTypeForImpact(annualLoss) {
+      if (state.selectedAreas.includes("ai")) return "Datová/AI diagnostika před implementací";
+      if (state.selectedAreas.includes("integration")) return "Integrační discovery a automatizace toku dat";
+      if (state.selectedAreas.includes("automation") || state.selectedAreas.includes("internal")) return "Automatizace procesu s měřitelnou úsporou času";
+      if (annualLoss >= 1000000) return "Fáze 0 + návrh řešení s ROI metrikou";
+      if (annualLoss >= 250000) return "Zúžené discovery a pilot automatizace";
+      return "Kvalifikace problému před návrhem projektu";
+    }
+
+    function clampNumber(value, min, max) {
+      const parsed = Number(value);
+      if (Number.isNaN(parsed)) return min;
+      return Math.min(max, Math.max(min, parsed));
+    }
+
+    function recommendationFor(total) {
+      if (total >= 80) return "Prioritní lead - rozhodnout rychlá nabídka vs. Fáze 0";
+      if (total >= 60) return "Kvalitní lead - ověřit scope a další krok";
+      if (total >= 40) return "Doplnit vstupy nebo diagnostika";
+      return "Nurturing";
+    }
+
+    function recommendationClass(total) {
+      if (total >= 80) return "success";
+      if (total >= 40) return "warning";
+      return "danger";
+    }
+
+    function calculateRoles() {
+      const involve = new Set();
+      const text = collectDiagnosticText();
+
+      state.selectedAreas.forEach((id) => {
+        const area = areaById(id);
+        if (area) area.roles.forEach((role) => involve.add(role));
+      });
+
+      if (state.selectedAreas.length > 0) involve.add("PM");
+      if (["internal", "automation", "integration", "ai", "security"].some((id) => state.selectedAreas.includes(id))) involve.add("Analyst");
+      if (["internal", "automation", "integration", "mobile"].some((id) => state.selectedAreas.includes(id))) involve.add("QA");
+      if (["devops", "maintenance"].some((id) => state.selectedAreas.includes(id))) involve.add("DevOps");
+      if (textContains(text, ["gdpr", "nis2", "hipaa", "osob", "citliv", "zdravot", "finan", "audit", "regul"])) involve.add("Security");
+      if (textContains(text, ["sla", "rto", "rpo", "monitoring", "incident", "výpad", "vypad", "ci/cd"])) involve.add("DevOps");
+
+      const doNotInvolve = allRoles.filter((role) => !involve.has(role));
+      return {
+        involve: Array.from(involve),
+        doNotInvolve
+      };
+    }
+
+    function calculateRisks() {
+      const risks = [];
+      const text = collectDiagnosticText();
+      const months = monthsUntil(state.bant.targetDate);
+
+      if (state.bant.decisionMakerAccess === false) risks.push("Nejednáme přímo s rozhodovatelem.");
+      if (!state.decisionMap.economicBuyer && state.bant.decisionMakerAccess === false) risks.push("Chybí ekonomický buyer v decision maker mapě.");
+      if (state.decisionMap.blocker) risks.push("Identifikovaný blocker v nákupním nebo technickém rozhodování.");
+      if (state.bant.budget === "<100k") {
+        risks.push(hasStrategicException()
+          ? "Rozpočet je pod standardním minimem, pokračovat jen jako strategická výjimka."
+          : "Rozpočet je pod typickou cílovou velikostí zakázky.");
+      }
+      if (months !== null && months < 0) risks.push("Target date je v minulosti nebo špatně zadaný.");
+      if (months !== null && months < 1) risks.push("Velmi krátký termín může vyžadovat zúžení scope.");
+      if (state.selectedAreas.includes("integration")) {
+        const answer = state.diagnostics.integration?.answers?.apiDocs || "";
+        if (textContains(answer, ["ne", "není", "nemáme", "neexist", "chybí"])) risks.push("Integrační projekt bez potvrzené API dokumentace.");
+      }
+      if (state.selectedAreas.includes("security") || textContains(text, ["gdpr", "nis2", "hipaa", "osob", "citliv", "zdravot", "finan", "děti", "deti"])) {
+        risks.push("Nutný security/compliance vstup před nabídkou.");
+      }
+      if (state.selectedAreas.includes("ai") && textContains(text, ["nejsou data", "nemáme data", "nevíme", "nevim"])) {
+        risks.push("AI/data téma bez potvrzené dostupnosti a kvality dat.");
+      }
+      if (state.selectedAreas.includes("maintenance") && textContains(text, ["bez dokumentace", "nemáme přístupy", "nemame pristupy", "neznáme", "nezname"])) {
+        risks.push("Převzetí systému s chybějící dokumentací nebo přístupy.");
+      }
+
+      return Array.from(new Set(risks));
+    }
+
+    function calculateRiskRadar() {
+      const text = collectDiagnosticText();
+      const months = monthsUntil(state.bant.targetDate);
+      const radar = [
+        { key: "business", label: "Obchodní", level: 1, action: "Doplnit business case a ověřit buyer mapu." },
+        { key: "technical", label: "Technické", level: 1, action: "Ověřit stack, přístupy a technické limity." },
+        { key: "data", label: "Datové", level: 1, action: "Potvrdit vlastníka, kvalitu a dostupnost dat." },
+        { key: "compliance", label: "Compliance", level: 0, action: "Bez zvláštní akce z aktuálního intake." },
+        { key: "operations", label: "Provozní", level: 1, action: "Upřesnit SLA, provozní odpovědnost a podporu." }
+      ];
+      const byKey = Object.fromEntries(radar.map((item) => [item.key, item]));
+
+      if (state.bant.decisionMakerAccess === false || !state.decisionMap.economicBuyer || (state.bant.budget === "<100k" && !hasStrategicException())) {
+        byKey.business.level = 3;
+        byKey.business.action = "Neotevírat plnou nabídku bez rozhodovatele, rozpočtu a jasného sponzora.";
+      }
+      if (months !== null && months < 1) {
+        byKey.operations.level = 3;
+        byKey.operations.action = "Zúžit scope nebo navrhnout placenou Fázi 0 před termínovým závazkem.";
+      }
+      if (state.selectedAreas.includes("integration")) {
+        const answer = state.diagnostics.integration?.answers?.apiDocs || "";
+        byKey.technical.level = textContains(answer, ["ne", "není", "nemáme", "neexist", "chybí"]) ? 3 : 2;
+        byKey.technical.action = "Ověřit API dokumentaci, sandbox a odpovědnost dodavatele.";
+      }
+      if (state.selectedAreas.includes("ai")) {
+        const readiness = calculateDataReadiness();
+        byKey.data.level = readiness.score < 45 ? 3 : readiness.score < 70 ? 2 : 1;
+        byKey.data.action = readiness.score < 70 ? "Doporučit datový audit před AI slibem." : "Potvrdit datovou metriku úspěchu v discovery.";
+      }
+      if (state.selectedAreas.includes("security") || textContains(text, ["gdpr", "nis2", "hipaa", "osob", "citliv", "zdravot", "finan", "hr", "mzdy", "děti", "deti"])) {
+        byKey.compliance.level = 3;
+        byKey.compliance.action = "Zapojit security/compliance ještě před cenovou nabídkou.";
+      }
+      if (state.selectedAreas.includes("maintenance") || textContains(text, ["sla", "rto", "rpo", "monitoring", "incident", "výpad", "vypad"])) {
+        byKey.operations.level = Math.max(byKey.operations.level, 2);
+        byKey.operations.action = "Vyjasnit provozní model, monitoring, incidenty a cenu výpadku.";
+      }
+
+      return radar;
+    }
+
+    function calculateDataReadiness() {
+      if (!state.selectedAreas.includes("ai") && !state.selectedAreas.includes("integration")) {
+        return { score: 100, label: "Není relevantní", checks: [], applicable: false };
+      }
+
+      const text = collectDiagnosticText();
+      const checks = [
+        { label: "Data dostupná", ok: textContains(text, ["ano", "máme", "mame", "exist", "historická", "historicka", "export", "api"]) && !textContains(text, ["nejsou data", "nemáme data", "nemame data"]) },
+        { label: "Vlastník dat", ok: textContains(text, ["owner", "vlastník", "vlastnik", "spravuje", "it", "data tým", "data tym"]) },
+        { label: "Kvalita popsaná", ok: textContains(text, ["kvalit", "valid", "čist", "cist", "kontrol", "audit"]) },
+        { label: "Právní titul", ok: textContains(text, ["gdpr", "souhlas", "smlouva", "oprávně", "opravne", "dpa", "audit"]) },
+        { label: "API/export", ok: textContains(text, ["api", "export", "csv", "sandbox", "datab", "sql"]) }
+      ];
+      const score = Math.round((checks.filter((check) => check.ok).length / checks.length) * 100);
+      const label = score >= 80 ? "Data připravena" : score >= 45 ? "Ověřit v discovery" : "Nízká připravenost dat";
+      return { score, label, checks, applicable: true };
+    }
+
+    function calculateFitMeter(score, risks, impact) {
+      const highRiskCount = calculateRiskRadar().filter((risk) => risk.level >= 3).length;
+      const hasStrongImpact = impact.annualLoss >= 500000;
+      const hasBuyerSignal = state.bant.decisionMakerAccess === true || Boolean(state.decisionMap.economicBuyer);
+      const lowBudgetWithoutException = state.bant.budget === "<100k" && !hasStrategicException();
+      if (score.total >= 70 && hasStrongImpact && highRiskCount === 0 && hasBuyerSignal) {
+        return {
+          label: "VELYOS fit",
+          className: "success",
+          detail: "Měřitelný dopad, obchodní kvalifikace a rizika jsou v pásmu pro aktivní nabídku."
+        };
+      }
+      if (score.total < 40 || lowBudgetWithoutException || !hasBuyerSignal && !hasStrongImpact) {
+        return {
+          label: "Nurturing",
+          className: "danger",
+          detail: "Slabý rozpočet, chybějící rozhodovatel nebo nízký dopad. Držet lehkou kvalifikaci."
+        };
+      }
+      if (risks.length || highRiskCount > 0 || calculateDataReadiness().score < 45) {
+        return {
+          label: "Diagnostika nutná",
+          className: "warning",
+          detail: "Téma má potenciál, ale před nabídkou je potřeba řízeně ověřit rizika a vstupy."
+        };
+      }
+      return {
+        label: "Diagnostika nutná",
+        className: "warning",
+        detail: "Doplnit scope, rozhodovací mapu a očekávaný ROI před nabídkou."
+      };
+    }
+
+    function phaseZeroProposal(risks, dataReadiness) {
+      const strategicException = Boolean(state.strategicExceptionReason.trim());
+      const belowMinimumWithoutException = state.bant.budget === "<100k" && !strategicException;
+      const needsDiagnostic = !belowMinimumWithoutException && (
+        risks.length > 0
+        || (dataReadiness.applicable && dataReadiness.score < 70)
+        || state.bant.decisionMakerAccess === false
+        || state.selectedAreas.some((id) => TECHNICAL_DIAGNOSTIC_AREAS.includes(id))
+      );
+      if (!needsDiagnostic) {
+        return {
+          title: belowMinimumWithoutException ? "Diagnostiku nepoužít - lead pod minimem" : "Standardní discovery před nabídkou",
+          duration: "60-90 minut",
+          roles: "PM + relevantní technická role",
+          output: belowMinimumWithoutException ? "Rozhodnout nurturing / stop nebo zapsat strategickou výjimku." : "Scope, předpoklady, rámcová cena a další krok.",
+          clientInputs: "Business cíl, kontakt na IT/provoz a dostupné podklady."
+        };
+      }
+      return {
+        title: diagnosticPackage.name,
+        price: diagnosticPackage.price,
+        duration: diagnosticPackage.duration,
+        roles: calculateRoles().involve.filter((role) => ["PM", "Analyst", "Backend", "Security", "AI/Data", "DevOps"].includes(role)).join(" + ") || "PM + Analyst",
+        output: diagnosticPackage.outputs.join("; "),
+        clientInputs: "Procesní data, přístupy/API dokumentace, vlastník dat, rozhodovatel a omezení compliance."
+      };
+    }
+
+    function calculateTeamAssignments(roles = calculateRoles()) {
+      const assignmentMap = {
+        PM: {
+          owner: "PM/analytik role",
+          responsibility: "Převzít scope, další krok, Definition of Ready a interní triage."
+        },
+        Analyst: {
+          owner: "PM/analytik role",
+          responsibility: "Zmapovat proces, výjimky, role uživatelů a business pravidla."
+        },
+        "UX/UI": {
+          owner: "Web/design architekt",
+          responsibility: "Ověřit uživatele, obrazovky, brand, použitelnost a obsah."
+        },
+        Frontend: {
+          owner: "Web/design architekt",
+          responsibility: "Ověřit web/portál, frontend rozsah, zařízení a napojení na backend."
+        },
+        Backend: {
+          owner: "IT šéf / architekt",
+          responsibility: "Ověřit datový model, API, role, logiku a technický scope."
+        },
+        DevOps: {
+          owner: "IT šéf / architekt",
+          responsibility: "Ověřit hosting, monitoring, zálohy, SLA, RTO/RPO a release proces."
+        },
+        QA: {
+          owner: "Technik / integrace",
+          responsibility: "Zachytit kritické cesty, akceptační scénáře a rizika chyb."
+        },
+        Security: {
+          owner: "IT šéf / architekt",
+          responsibility: "Ověřit typ dat, právní požadavky, přístupy, audit a compliance rizika."
+        },
+        "AI/Data": {
+          owner: "Technik / integrace",
+          responsibility: "Ověřit dostupnost dat, kvalitu, metriku úspěchu a human-in-the-loop."
+        },
+        Mobile: {
+          owner: "Web/design architekt",
+          responsibility: "Ověřit platformy, použití v terénu, offline režim a mobilní UX."
+        },
+        "Tech Lead": {
+          owner: "IT šéf / architekt",
+          responsibility: "Posoudit převzetí systému, technický dluh, přístupy a stabilizační fázi."
+        }
+      };
+      return roles.involve.map((role) => ({
+        role,
+        owner: assignmentMap[role]?.owner || "Zakladatelský tým",
+        responsibility: assignmentMap[role]?.responsibility || "Doplnit odpovědnost v interní triage."
+      }));
+    }
+
+    function calculateMissingInputs(dataReadiness = calculateDataReadiness()) {
+      const missing = [];
+      if (!state.meetingContext.attendees) missing.push("Doplnit účastníky schůzky a role u klienta.");
+      if (!state.meetingContext.meetingGoal) missing.push("Doplnit očekávaný výstup schůzky.");
+      if (!state.decisionMap.economicBuyer) missing.push("Doplnit ekonomického buyera.");
+      if (!state.decisionMap.technicalBuyer && ["backend", "integration", "ai", "devops", "security", "maintenance"].some((id) => state.selectedAreas.includes(id))) {
+        missing.push("Doplnit technického buyera nebo IT kontakt.");
+      }
+      if (!state.impact.currentPain) missing.push("Doplnit popis provozní bolesti.");
+      if (!state.selectedSignals.length) missing.push("Doplnit ano/ne signály rozhodovacího stromu.");
+      if (state.selectedAreas.includes("integration") && !state.diagnostics.integration?.answers?.apiDocs) {
+        missing.push("Ověřit API dokumentaci, sandbox a technický kontakt dodavatele.");
+      }
+      if (state.selectedAreas.includes("ai") && dataReadiness.score < 70) {
+        missing.push("Ověřit dostupnost, vlastníka, kvalitu a právní použitelnost dat pro AI.");
+      }
+      if (state.selectedAreas.includes("security") && !state.diagnostics.security?.answers?.regulations) {
+        missing.push("Doplnit regulace, typ dat, audit a požadavky compliance.");
+      }
+      if (state.selectedAreas.includes("maintenance") && !state.diagnostics.maintenance?.answers?.system) {
+        missing.push("Doplnit systém k převzetí, repozitář, přístupy, dokumentaci a historii incidentů.");
+      }
+      state.selectedAreas.forEach((id) => {
+        const area = areaById(id);
+        if (!area) return;
+        const answers = state.diagnostics[id]?.answers || {};
+        area.questions.forEach((question) => {
+          if (!answers[question.key]) missing.push(`Doplnit ${area.title}: ${question.label}.`);
+        });
+      });
+      return Array.from(new Set(missing));
+    }
+
+    function hasStrategicException() {
+      return Boolean(state.strategicExceptionReason.trim());
+    }
+
+    function isSimpleWebScope(risks = calculateRisks(), score = calculateScore()) {
+      return state.selectedAreas.length > 0
+        && state.selectedAreas.length <= 2
+        && state.selectedAreas.every((id) => ["web", "ux"].includes(id))
+        && risks.length === 0
+        && score.total >= 60;
+    }
+
+    function requiresPaidDiagnostic(dataReadiness = calculateDataReadiness()) {
+      if (state.bant.budget === "<100k" && !hasStrategicException()) return false;
+      return state.selectedAreas.some((id) => TECHNICAL_DIAGNOSTIC_AREAS.includes(id))
+        || (dataReadiness.applicable && dataReadiness.score < 70)
+        || state.bant.decisionMakerAccess === false;
+    }
+
+    function calculateBusinessRulesApplied(score, risks, impact, dataReadiness, nextStep) {
+      const appliedRules = [];
+      if (state.bant.budget === "<100k") {
+        appliedRules.push(hasStrategicException()
+          ? "Rozpočet je pod 100k Kč, ale je zapsaná strategická výjimka."
+          : "Rozpočet je pod 100k Kč: nízký fit, nepoužívat placenou diagnostiku bez strategické hodnoty.");
+      }
+      if (state.selectedAreas.some((id) => TECHNICAL_DIAGNOSTIC_AREAS.includes(id))) {
+        appliedRules.push("Technická/procesní oblast: výchozí další krok je placená Fáze 0.");
+      }
+      if (isSimpleWebScope(risks, score)) {
+        appliedRules.push("Jednoduchý web/UX bez integrací: povolená rychlá nabídka po krátkém discovery.");
+      }
+      if (dataReadiness.applicable && dataReadiness.score < 70) {
+        appliedRules.push("Data/API nejsou připravené: před nabídkou ověřit dostupnost, vlastníka, kvalitu a právní titul.");
+      }
+      if (risks.length) {
+        appliedRules.push("Existují rizika z intake: neslibovat závaznou cenu bez ověření.");
+      }
+      if (!appliedRules.length) {
+        appliedRules.push("Bez tvrdého rizikového pravidla: držet standardní discovery a Definition of Ready.");
+      }
+
+      return {
+        primaryOffer,
+        minTargetBudget: MIN_TARGET_BUDGET,
+        minimumStandardProjectCzk: MIN_STANDARD_PROJECT_CZK,
+        belowMinimum: state.bant.budget === "<100k",
+        strategicException: hasStrategicException(),
+        recommendedDecision: nextStep.label,
+        appliedRules,
+        diagnosticDefaultAreas: [...TECHNICAL_DIAGNOSTIC_AREAS],
+        impactAnnualLoss: impact.annualLoss
+      };
+    }
+
+    function diagnosticPackageRecommendation(nextStep, risks, dataReadiness) {
+      const recommended = nextStep.type === "paid_diagnostic";
+      return {
+        recommended,
+        package: diagnosticPackage,
+        reason: recommended
+          ? nextStep.detail
+          : state.bant.budget === "<100k" && !hasStrategicException()
+            ? "Lead je pod minimem bez strategické výjimky, proto Fázi 0 nenabízet."
+            : "Aktuální scope nevyžaduje fixní placenou diagnostiku.",
+        blockers: [
+          ...risks,
+          ...(dataReadiness.applicable && dataReadiness.score < 70 ? ["Nízká datová/API připravenost."] : [])
+        ]
+      };
+    }
+
+    function calculateGtmClassification(score, risks, impact, nextStep) {
+      const segmentText = [
+        state.meetingContext.customerSegment,
+        state.company.contactRole,
+        state.impact.currentPain,
+        collectDiagnosticText()
+      ].join(" ").toLowerCase();
+      const hasOperationsLanguage = textContains(segmentText, [
+        "smb", "provoz", "výro", "vyro", "servis", "logistik", "sklad", "administrativ", "účet", "ucet", "b2b", "služ", "sluz"
+      ]);
+      const hasManualProcess = state.selectedAreas.some((id) => ["automation", "integration", "internal", "maintenance"].includes(id))
+        || state.selectedSignals.some((id) => ["manual_process", "data_retyping", "systems_to_connect", "takeover"].includes(id))
+        || textContains(segmentText, ["excel", "e-mail", "email", "papír", "papir", "ručně", "rucne", "přepis", "prepis", "schval"]);
+      const hasBuyer = state.bant.decisionMakerAccess === true || Boolean(state.decisionMap.economicBuyer);
+      const budgetFit = state.bant.budget !== "<100k" || hasStrategicException();
+      const measurableImpact = impact.annualLoss >= MIN_STANDARD_PROJECT_CZK || impact.weeklyManualCost > 0 || impact.annualExceptionCost > 0;
+      const icpScore = [
+        hasOperationsLanguage,
+        hasManualProcess,
+        hasBuyer,
+        budgetFit,
+        measurableImpact
+      ].filter(Boolean).length;
+      const icpFit = icpScore >= 4
+        ? { label: "Vysoký ICP fit", className: "success" }
+        : icpScore >= 3
+          ? { label: "Střední ICP fit", className: "warning" }
+          : { label: "Nízký ICP fit", className: "danger" };
+      const outboundSegment = hasOperationsLanguage ? gtmStrategy.primaryIcp : "Mimo primární SMB provoz";
+      const recommendedSalesAsset = nextStep.type === "paid_diagnostic"
+        ? "Fáze 0 one-pager + procesní ROI kalkulace"
+        : nextStep.type === "quick_offer"
+          ? "Krátký scope checklist + zúžená nabídka"
+          : nextStep.type === "nurturing"
+            ? "Nurturing follow-up + checklist ruční práce"
+            : nextStep.type === "stop"
+              ? "Stop důvod + případná strategická výjimka"
+              : "Missing inputs checklist";
+      const caseStudyCandidate = icpScore >= 4
+        && measurableImpact
+        && ["paid_diagnostic", "quick_offer"].includes(nextStep.type)
+        && risks.length <= 2;
+
+      return {
+        strategy: gtmStrategy,
+        icpFit: {
+          ...icpFit,
+          score: icpScore,
+          maxScore: 5,
+          reason: [
+            hasOperationsLanguage ? "Segment odpovídá SMB/provoznímu trhu." : "Segment zatím není jasně SMB provoz.",
+            hasManualProcess ? "Lead obsahuje ruční proces, integraci nebo provozní neefektivitu." : "Chybí jasný ruční/provozní proces.",
+            hasBuyer ? "Je dostupný rozhodovatel nebo ekonomický buyer." : "Chybí buyer signál.",
+            budgetFit ? "Rozpočet je v minimu nebo má strategickou výjimku." : "Rozpočet je pod minimem bez výjimky.",
+            measurableImpact ? "Dopad je měřitelný nebo dopočitatelný." : "Dopad zatím není měřitelný."
+          ]
+        },
+        outboundSegment,
+        recommendedSalesAsset,
+        caseStudyPotential: {
+          label: caseStudyCandidate ? "Vhodné pro case study" : "Zatím nevhodné pro case study",
+          recommended: caseStudyCandidate,
+          reason: caseStudyCandidate
+            ? "Lead má ICP fit, měřitelný dopad a relativně nízký počet blokujících rizik."
+            : "Chybí silný ICP fit, měřitelný dopad, vhodný další krok nebo jsou rizika příliš vysoká."
+        },
+        whyThisCompany: [
+          hasManualProcess ? "pravděpodobný ruční nebo nepropojený proces" : "ověřit existenci opakovatelného procesu",
+          measurableImpact ? "dopočitatelný provozní dopad" : "dopočítat úsporu času nebo cenu chyb",
+          hasBuyer ? "dostupný buyer signál" : "doplnit rozhodovatele",
+          budgetFit ? "rozpočtově použitelný lead" : "rozpočet pod minimem"
+        ],
+        outboundHypothesis: "Ve firmě může existovat ruční přepisování dat, schvalování nebo provozní předávka, kterou lze zmapovat ve Fázi 0 a převést do pilotu automatizace."
+      };
+    }
+
+    function nextStepOptions(nextStep, score, risks, impact, dataReadiness, missingInputs) {
+      const lowBudget = state.bant.budget === "<100k" && !hasStrategicException();
+      const technicalDiagnostic = requiresPaidDiagnostic(dataReadiness);
+      const simpleWeb = isSimpleWebScope(risks, score);
+      const noViableBusinessCase = lowBudget && impact.annualLoss < MIN_STANDARD_PROJECT_CZK;
+      return [
+        {
+          type: "quick_offer",
+          label: "Rychlá nabídka",
+          detail: simpleWeb ? "Jasný web/UX scope bez integrací." : "Jen pro jasný nízkorizikový web/UX scope.",
+          available: simpleWeb
+        },
+        {
+          type: "paid_diagnostic",
+          label: "Placená diagnostika",
+          detail: technicalDiagnostic ? `${diagnosticPackage.name}, ${diagnosticPackage.price}, ${diagnosticPackage.duration}.` : "Použít pro automatizaci, integrace, AI, interní systém, DevOps, security nebo převzetí systému.",
+          available: technicalDiagnostic
+        },
+        {
+          type: "missing_inputs",
+          label: "Doplnit vstupy",
+          detail: missingInputs.length ? "Chybí Definition of Ready pro nabídku nebo Fázi 0." : "Použít, když nelze rozhodnout bez konkrétních vstupů.",
+          available: missingInputs.length > 0
+        },
+        {
+          type: "nurturing",
+          label: "Nurturing",
+          detail: lowBudget ? "Rozpočet je pod 100k Kč bez strategické výjimky." : "Fit existuje, ale chybí timing, buyer nebo priorita.",
+          available: lowBudget || score.total < 60
+        },
+        {
+          type: "stop",
+          label: "Stop",
+          detail: noViableBusinessCase ? "Pod minimem a bez měřitelného dopadu." : "Použít pro nefit, nereálná očekávání nebo chybějící business case.",
+          available: noViableBusinessCase || (score.total < 40 && !impact.annualLoss)
+        }
+      ].map((option) => ({ ...option, active: option.type === nextStep.type }));
+    }
+
+    function recommendedNextStep(score, risks, impact = calculateImpact(), dataReadiness = calculateDataReadiness()) {
+      const highRisk = calculateRiskRadar().some((risk) => risk.level >= 3);
+      const missingInputs = calculateMissingInputs(dataReadiness);
+      const lowBudgetWithoutException = state.bant.budget === "<100k" && !hasStrategicException();
+      const smallClearScope = isSimpleWebScope(risks, score);
+      const technicalDiagnostic = requiresPaidDiagnostic(dataReadiness);
+      if (lowBudgetWithoutException && impact.annualLoss < MIN_STANDARD_PROJECT_CZK) {
+        return {
+          type: "stop",
+          label: "Stop",
+          detail: "Rozpočet je pod 100k Kč, není zapsaná strategická výjimka a dopad nevytváří business case pro Velios."
+        };
+      }
+      if (lowBudgetWithoutException) {
+        return {
+          type: "nurturing",
+          label: "Nurturing",
+          detail: "Rozpočet je pod standardním minimem 100k Kč. Držet lehký follow-up, nebo doplnit strategickou referenční výjimku."
+        };
+      }
+      if (smallClearScope) {
+        return {
+          type: "quick_offer",
+          label: "Rychlá nabídka",
+          detail: "Scope vypadá jasně a nízkorizikově. Stačí krátké discovery a zúžená nabídka."
+        };
+      }
+      if (technicalDiagnostic || risks.length || highRisk) {
+        return {
+          type: "paid_diagnostic",
+          label: "Placená diagnostika",
+          detail: `${diagnosticPackage.name}: ${diagnosticPackage.price}, ${diagnosticPackage.duration}. Před cenou ověřit proces, data, integrace, rizika a business case.`
+        };
+      }
+      if (missingInputs.length) {
+        return {
+          type: "missing_inputs",
+          label: "Doplnit vstupy",
+          detail: "Chybí Definition of Ready pro nabídku nebo diagnostiku. Domluvit konkrétní follow-up."
+        };
+      }
+      if (score.total >= 60) {
+        return {
+          type: "quick_offer",
+          label: "Rychlá nabídka",
+          detail: "Lead je kvalitní a bez tvrdých technických pravidel. Nabídka smí vzniknout až po krátkém potvrzení scope."
+        };
+      }
+      return {
+        type: "nurturing",
+        label: "Nurturing",
+        detail: "Fit nebo priorita zatím nejsou dost silné. Držet follow-up a doplnit business dopad."
+      };
+    }
+
+    function opportunityTimeline() {
+      return [
+        { step: "Intake", duration: "20-30 min", owner: "Obchod", note: "Kvalifikace problému, dopadu a fitu." },
+        { step: "Discovery", duration: "60 min až 2 týdny", owner: "PM + Analyst", note: "Ověření rizik, dat, integrací a business case." },
+        { step: "Návrh řešení", duration: "2-5 dnů", owner: "VELYOS", note: "Scope, cena, role, milníky a měření návratnosti." },
+        { step: "Implementace", duration: "Podle scope", owner: "Projektový tým", note: "Dodávka po prioritách s pravidelným rozhodováním." },
+        { step: "Go-live", duration: "1-2 týdny", owner: "VELYOS + klient", note: "Předání, stabilizace a provozní odpovědnosti." },
+        { step: "Měření ROI", duration: "30-90 dnů", owner: "Klient + VELYOS", note: "Vyhodnocení úspory času, výjimek a návratnosti." }
+      ];
+    }
+
+    function buildRecord(status = state.currentStatus) {
+      const score = calculateScore();
+      const roles = calculateRoles();
+      const risks = calculateRisks();
+      const impact = calculateImpact();
+      const riskRadar = calculateRiskRadar();
+      const dataReadiness = calculateDataReadiness();
+      const fit = calculateFitMeter(score, risks, impact);
+      const phaseZero = phaseZeroProposal(risks, dataReadiness);
+      const teamAssignments = calculateTeamAssignments(roles);
+      const missingInputs = calculateMissingInputs(dataReadiness);
+      const nextStep = recommendedNextStep(score, risks, impact, dataReadiness);
+      const businessRulesApplied = calculateBusinessRulesApplied(score, risks, impact, dataReadiness, nextStep);
+      const diagnosticRecommendation = diagnosticPackageRecommendation(nextStep, risks, dataReadiness);
+      const gtmClassification = calculateGtmClassification(score, risks, impact, nextStep);
+      const now = new Date().toISOString();
+      const existing = recordsCache.find((item) => item.id === state.currentId);
+      const outputs = buildOutputs(score, roles, risks, impact, riskRadar, dataReadiness, fit, phaseZero, teamAssignments, missingInputs, nextStep, gtmClassification);
+
+      const record = {
+        id: state.currentId,
+        createdAt: existing?.createdAt || now,
+        updatedAt: now,
+        status,
+        owner: state.owner,
+        source: state.source,
+        primaryOffer,
+        meetingContext: cleanMeetingContext(state.meetingContext),
+        company: cleanCompany(state.company),
+        decisionMap: structuredCloneSafe(state.decisionMap),
+        bant: structuredCloneSafe(state.bant),
+        impact: structuredCloneSafe(state.impact),
+        leadSourceScore: clampNumber(state.leadSourceScore, 0, 20),
+        selectedAreas: [...state.selectedAreas],
+        selectedSignals: [...state.selectedSignals],
+        diagnostics: structuredCloneSafe(state.diagnostics),
+        ui: {
+          step: state.step,
+          diagnosticIndex: state.diagnosticIndex
+        },
+        score,
+        impact,
+        fit,
+        roles,
+        risks,
+        riskRadar,
+        dataReadiness,
+        phaseZero,
+        phaseZeroRecommendation: phaseZero,
+        teamAssignments,
+        missingInputs,
+        recommendedNextStep: nextStep,
+        businessRulesApplied,
+        diagnosticPackageRecommendation: diagnosticRecommendation,
+        gtmClassification,
+        outputs
+      };
+      if (state.strategicExceptionReason.trim()) {
+        record.strategicExceptionReason = state.strategicExceptionReason.trim();
+      }
+      return record;
+    }
+
+    function structuredCloneSafe(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function cleanCompany(company) {
+      return {
+        name: company?.name || "",
+        contactName: company?.contactName || "",
+        contactRole: company?.contactRole || ""
+      };
+    }
+
+    function cleanMeetingContext(context = {}) {
+      return {
+        mode: context.mode || "onsite",
+        customerSegment: context.customerSegment || "SMB služby/provoz",
+        initiatedBy: context.initiatedBy || "",
+        attendees: context.attendees || "",
+        meetingGoal: context.meetingGoal || ""
+      };
+    }
+
+    function meetingModeLabel(value = state.meetingContext.mode) {
+      return {
+        onsite: "On-site u zákazníka",
+        online: "Online / telefon",
+        internal: "Interní doplnění po schůzce"
+      }[value] || value || "Nevyplněno";
+    }
+
+    function budgetLabel(value) {
+      return {
+        "<100k": "<100k Kč",
+        "100-300k": "100k-300k Kč",
+        "300k-1M": "300k-1M Kč",
+        "1M+": "1M+ Kč"
+      }[value] || "Nevyplněno";
+    }
+
+    function decisionMakerLabel() {
+      if (state.bant.decisionMakerAccess === true) return "Ano";
+      if (state.bant.decisionMakerAccess === false) return "Ne";
+      return "Nevyplněno";
+    }
+
+    function diagnosticLines() {
+      if (state.selectedAreas.length === 0) return "- Zatím nejsou vybrané oblasti.";
+      return state.selectedAreas.map((id) => {
+        const area = areaById(id);
+        if (!area) return "";
+        const answers = state.diagnostics[id]?.answers || {};
+        const lines = area.questions.map((question) => `  - ${question.label}: ${answers[question.key] || "Nevyplněno"}`);
+        return `- ${area.title}\n${lines.join("\n")}`;
+      }).filter(Boolean).join("\n");
+    }
+
+    function buildOutputs(score, roles, risks, impact = calculateImpact(), riskRadar = calculateRiskRadar(), dataReadiness = calculateDataReadiness(), fit = calculateFitMeter(score, risks, impact), phaseZero = phaseZeroProposal(risks, dataReadiness), teamAssignments = calculateTeamAssignments(roles), missingInputs = calculateMissingInputs(dataReadiness), nextStep = recommendedNextStep(score, risks, impact, dataReadiness), gtmClassification = calculateGtmClassification(score, risks, impact, nextStep)) {
+      const areas = selectedAreaTitles().join(", ") || "Nevybráno";
+      const signals = selectedSignalTitles().map((signal) => `- ${signal}`).join("\n") || "- Zatím nejsou potvrzené signály.";
+      const riskText = risks.length ? risks.map((risk) => `- ${risk}`).join("\n") : "- Bez zásadních rizik z intake.";
+      const radarText = riskRadar.map((risk) => `- ${risk.label}: ${risk.level}/3 - ${risk.action}`).join("\n");
+      const dataChecks = dataReadiness.checks.length ? dataReadiness.checks.map((check) => `- ${check.label}: ${check.ok ? "OK" : "ověřit"}`).join("\n") : "- Datová připravenost zatím není relevantní nebo není ověřená.";
+      const missingText = missingInputs.length ? missingInputs.map((item) => `- ${item}`).join("\n") : "- Žádné zásadní chybějící vstupy z aktuálního intake.";
+      const gtmReasonText = gtmClassification.icpFit.reason.map((item) => `- ${item}`).join("\n");
+      const whyThisCompanyText = gtmClassification.whyThisCompany.map((item) => `- ${item}`).join("\n");
+      const strategicExceptionText = state.strategicExceptionReason.trim();
+      const assignmentText = teamAssignments.length
+        ? teamAssignments.map((item) => `- ${item.role}: ${item.owner} - ${item.responsibility}`).join("\n")
+        : "- Zatím není koho zapojit.";
+      const businessRuleText = calculateBusinessRulesApplied(score, risks, impact, dataReadiness, nextStep)
+        .appliedRules
+        .map((rule) => `- ${rule}`)
+        .join("\n");
+      const followUpNextStepText = {
+        quick_offer: "Scope zatím působí jasně a nízkorizikově. Navrhujeme krátce potvrdit poslední vstupy a připravit zúženou nabídku.",
+        nurturing: "V tuto chvíli dává největší smysl držet lehký follow-up, doplnit business dopad a vrátit se k projektu, až bude jasnější rozpočet nebo priorita.",
+        missing_inputs: "Před návrhem dalšího kroku potřebujeme doplnit několik vstupů, aby tým nepracoval s domněnkami.",
+        discovery: "Navrhujeme navazující discovery, kde ověříme scope, role, rizika a připravíme podklady pro nabídku.",
+        paid_diagnostic: `Navrhujeme nepřipravovat závaznou cenu bez ověření rozsahu. Další smysluplný krok je ${diagnosticPackage.name} (${diagnosticPackage.price}, ${diagnosticPackage.duration}), kde ověříme proces, technické vstupy, rizika a doporučíme nejkratší cestu k měřitelnému výsledku.`,
+        stop: "V aktuální podobě nedoporučujeme otevírat projekt ani placenou diagnostiku. Důvodem je nízký rozpočet, slabý business case nebo nefit vůči minimální velikosti zakázky."
+      }[nextStep.type] || nextStep.detail;
+
+      const crmSummary = [
+        "# CRM zápis",
+        `Typ schůzky: ${meetingModeLabel()}`,
+        `Segment: ${state.meetingContext.customerSegment || "Nevyplněno"}`,
+        `Účastníci: ${state.meetingContext.attendees || "Nevyplněno"}`,
+        `Cíl schůzky: ${state.meetingContext.meetingGoal || "Nevyplněno"}`,
+        `Firma: ${state.company.name || "Nevyplněno"}`,
+        `Kontakt: ${state.company.contactName || "Nevyplněno"} (${state.company.contactRole || "role nevyplněna"})`,
+        `Owner: ${state.owner || "Nevyplněno"}`,
+        `Zdroj: ${state.source || "Nevyplněno"}`,
+        `Primární nabídka: ${primaryOffer}`,
+        `Minimální cílový rozpočet: ${budgetLabel(MIN_TARGET_BUDGET)}`,
+        `GTM motion: ${gtmClassification.strategy.motion}`,
+        `ICP fit: ${gtmClassification.icpFit.label} (${gtmClassification.icpFit.score}/${gtmClassification.icpFit.maxScore})`,
+        `Outbound segment: ${gtmClassification.outboundSegment}`,
+        `Doporučený obchodní asset: ${gtmClassification.recommendedSalesAsset}`,
+        `Case study potenciál: ${gtmClassification.caseStudyPotential.label}`,
+        `Rozpočet: ${budgetLabel(state.bant.budget)}`,
+        ...(strategicExceptionText ? [`Strategická výjimka: ${strategicExceptionText}`] : []),
+        `Target go-live: ${formatDate(state.bant.targetDate)}`,
+        `Rozhodovatel: ${decisionMakerLabel()}`,
+        `Ekonomický buyer: ${state.decisionMap.economicBuyer || "Nevyplněno"}`,
+        `Vybrané oblasti: ${areas}`,
+        `Deal score: ${score.total}/100`,
+        `VELYOS fit: ${fit.label}`,
+        `Roční ztráta / náklad problému: ${formatCurrency(impact.annualLoss)}`,
+        `Potenciál měsíční úspory: ${formatCurrency(impact.monthlySavingsPotential)}`,
+        `Doporučení: ${score.recommendation}`,
+        `Doporučený další krok: ${nextStep.label}`,
+        "",
+        "Signály rozhodovacího stromu:",
+        signals,
+        "",
+        "Rizika:",
+        riskText,
+        "",
+        "Použitá obchodní pravidla:",
+        businessRuleText,
+        "",
+        "GTM klasifikace:",
+        gtmReasonText,
+        "",
+        "Chybějící vstupy:",
+        missingText,
+        "",
+        "Další krok:",
+        nextStep.detail
+      ].join("\n");
+
+      const pmBrief = [
+        "# Handoff: obchod -> PM",
+        "",
+        "## Kontext schůzky",
+        `- Typ: ${meetingModeLabel()}`,
+        `- Segment: ${state.meetingContext.customerSegment || "Nevyplněno"}`,
+        `- Inicioval: ${state.meetingContext.initiatedBy || "Nevyplněno"}`,
+        `- Účastníci: ${state.meetingContext.attendees || "Nevyplněno"}`,
+        `- Cíl schůzky: ${state.meetingContext.meetingGoal || "Nevyplněno"}`,
+        "",
+        "## Firma",
+        `- Název: ${state.company.name || ""}`,
+        `- Kontakt: ${state.company.contactName || ""}`,
+        `- Role kontaktu: ${state.company.contactRole || ""}`,
+        `- Owner: ${state.owner || ""}`,
+        `- Zdroj: ${state.source || ""}`,
+        `- Primární nabídka Velios: ${primaryOffer}`,
+        `- Minimální cílový rozpočet: ${budgetLabel(MIN_TARGET_BUDGET)}`,
+        `- GTM motion: ${gtmClassification.strategy.motion}`,
+        `- ICP fit: ${gtmClassification.icpFit.label} (${gtmClassification.icpFit.score}/${gtmClassification.icpFit.maxScore})`,
+        `- Outbound segment: ${gtmClassification.outboundSegment}`,
+        `- Doporučený obchodní asset: ${gtmClassification.recommendedSalesAsset}`,
+        `- Case study potenciál: ${gtmClassification.caseStudyPotential.label}`,
+        "",
+        "## Obchodní kvalifikace",
+        `- Rozpočet: ${budgetLabel(state.bant.budget)}`,
+        ...(strategicExceptionText ? [`Strategická výjimka: ${strategicExceptionText}`] : []),
+        `- Target go-live: ${formatDate(state.bant.targetDate)}`,
+        `- Rozhodovatel: ${decisionMakerLabel()}`,
+        `- Ekonomický buyer: ${state.decisionMap.economicBuyer || "Nevyplněno"}`,
+        `- Technický buyer: ${state.decisionMap.technicalBuyer || "Nevyplněno"}`,
+        `- Champion: ${state.decisionMap.champion || "Nevyplněno"}`,
+        `- Blocker: ${state.decisionMap.blocker || "Nevyplněno"}`,
+        `- Deal score: ${score.total}/100`,
+        `- VELYOS fit: ${fit.label}`,
+        `- Doporučení: ${score.recommendation}`,
+        `- Roční ztráta / náklad problému: ${formatCurrency(impact.annualLoss)}`,
+        `- Potenciál měsíční úspory: ${formatCurrency(impact.monthlySavingsPotential)}`,
+        "",
+        "## Rozsah podle matice",
+        `- Vybrané oblasti: ${areas}`,
+        "",
+        "## Signály rozhodovacího stromu",
+        signals,
+        "",
+        "## Týmové assignmenty",
+        assignmentText,
+        "",
+        "## Missing inputs",
+        missingText,
+        "",
+        "## Role matrix",
+        `- Zapojit role: ${roles.involve.join(", ") || "Nevyplněno"}`,
+        `- Nezapojovat role: ${roles.doNotInvolve.join(", ") || "Nevyplněno"}`,
+        "",
+        "## Diagnostika",
+        diagnosticLines(),
+        "",
+        "## Rizika",
+        riskText,
+        "",
+        "## Risk Radar",
+        radarText,
+        "",
+        "## Velios obchodní pravidla",
+        businessRuleText,
+        "",
+        "## GTM klasifikace",
+        gtmReasonText,
+        "",
+        "## Proč tato firma",
+        whyThisCompanyText,
+        "",
+        "## Fáze 0 / Discovery",
+        `- Doporučení: ${phaseZero.title}`,
+        `- Cena: ${phaseZero.price || "N/A"}`,
+        `- Délka: ${phaseZero.duration}`,
+        `- Role: ${phaseZero.roles}`,
+        `- Výstup: ${phaseZero.output}`,
+        `- Klient dodá: ${phaseZero.clientInputs}`,
+        "",
+        "## Doporučený další krok",
+        `${nextStep.label}: ${nextStep.detail}`
+      ].join("\n");
+
+      const analystBrief = [
+        "# Handoff: obchod -> technický analytik",
+        "",
+        "## Kontext",
+        `- Firma: ${state.company.name || ""}`,
+        `- Kontakt: ${state.company.contactName || ""}`,
+        `- Role kontaktu: ${state.company.contactRole || ""}`,
+        `- Vybrané oblasti: ${areas}`,
+        `- Primární nabídka Velios: ${primaryOffer}`,
+        `- ICP fit: ${gtmClassification.icpFit.label}`,
+        `- Doporučený obchodní asset: ${gtmClassification.recommendedSalesAsset}`,
+        `- Technický buyer: ${state.decisionMap.technicalBuyer || "Nevyplněno"}`,
+        "",
+        "## Signály rozhodovacího stromu",
+        signals,
+        "",
+        "## Technická diagnostika",
+        diagnosticLines(),
+        "",
+        "## Role a vstupy",
+        `- Zapojit technické role: ${roles.involve.filter((role) => role !== "PM").join(", ") || "Nevyplněno"}`,
+        `- Nezapojovat technické role: ${roles.doNotInvolve.join(", ") || "Nevyplněno"}`,
+        "",
+        "## Technická a compliance rizika",
+        riskText,
+        "",
+        "## Data Readiness",
+        `- Skóre: ${dataReadiness.applicable ? `${dataReadiness.score}/100` : "N/A"}`,
+        `- Stav: ${dataReadiness.label}`,
+        dataChecks,
+        "",
+        "## Co ověřit v další fázi",
+        analystQuestions(),
+        "",
+        "## Chybějící vstupy",
+        missingText,
+        "",
+        "## Velios obchodní pravidla",
+        businessRuleText
+      ].join("\n");
+
+      const clientOnePager = buildClientSummaryText(areas, impact, nextStep, phaseZero);
+
+      const followUpEmail = [
+        `Předmět: Velios - shrnutí a navržený další krok pro ${state.company.name || "váš projekt"}`,
+        "",
+        `Dobrý den${state.company.contactName ? `, ${state.company.contactName}` : ""},`,
+        "",
+        "děkuji za dnešní rozhovor. Stručně shrnuji, co jsme si odnesli:",
+        "",
+        `- řešené oblasti: ${areas}`,
+        `- hlavní popsaný problém: ${state.impact.currentPain || "dopad ještě doplníme v dalším kroku"}`,
+        `- orientační roční náklad současného stavu: ${formatCurrency(impact.annualLoss)}`,
+        `- doporučený další krok: ${nextStep.label}`,
+        `- primární zaměření Velios: ${primaryOffer}`,
+        "",
+        followUpNextStepText,
+        "",
+        "Abychom se mohli připravit, prosíme o tyto vstupy:",
+        missingText,
+        "",
+        nextStep.type === "paid_diagnostic"
+          ? `Výstupem diagnostiky bude mapa procesu, úspora času, rizika, role, technické vstupy, scope fáze 1 a doporučení nabídka / stop.`
+          : "Výstupem dalšího kroku bude potvrzení business case, scope a rozhodnutí, zda pokračovat do nabídky, diagnostiky, nurturingu nebo stop.",
+        "",
+        "S pozdravem",
+        "Velios"
+      ].join("\n");
+
+      return { crmSummary, pmBrief, analystBrief, clientOnePager, followUpEmail };
+    }
+
+    function impactVerificationLabel() {
+      return state.impact.unverified ? "Obchodní odhad k ověření ve Fázi 0" : "Potvrzeno podle odpovědí ze schůzky";
+    }
+
+    function clientNextStepDetail(nextStep) {
+      if (nextStep.type === "paid_diagnostic") {
+        return `Doporučujeme ${diagnosticPackage.name}. Během ${diagnosticPackage.duration} ověříme proces, napojení na systémy, potřebná data a připravíme návrh první realizační fáze.`;
+      }
+      if (nextStep.type === "quick_offer") {
+        return "Doporučujeme krátce potvrdit rozsah a připravit zúženou nabídku.";
+      }
+      if (nextStep.type === "missing_inputs") {
+        return "Doporučujeme doplnit chybějící podklady a potom rozhodnout, zda má následovat diagnostika nebo nabídka.";
+      }
+      if (nextStep.type === "nurturing") {
+        return "Doporučujeme vrátit se k tématu ve chvíli, kdy bude jasnější priorita, rozpočet nebo rozhodovací proces.";
+      }
+      if (nextStep.type === "stop") {
+        return "V tuto chvíli nedoporučujeme otevírat projekt. Dává smysl nejdřív zpřesnit business důvod a očekávaný přínos.";
+      }
+      return nextStep.detail;
+    }
+
+    function clientInputsForSummary(phaseZero) {
+      const inputs = phaseZero.clientInputs || "Procesní popis, dostupné podklady a kontakt na rozhodovatele.";
+      return inputs.split(";").flatMap((item) => item.split(",")).map((item) => item.trim()).filter(Boolean);
+    }
+
+    function buildClientSummaryText(areas, impact, nextStep, phaseZero) {
+      const clientInputs = clientInputsForSummary(phaseZero);
+      return [
+        "# Klientské shrnutí",
+        "",
+        "## Problém",
+        `- Firma: ${state.company.name || "Nevyplněno"}`,
+        `- Řešené oblasti: ${areas}`,
+        `- Co dnes brzdí provoz: ${state.impact.currentPain || "Doplníme v dalším kroku."}`,
+        "",
+        "## Dopad",
+        `- Orientační roční náklad současného stavu: ${formatCurrency(impact.annualLoss)}`,
+        `- Orientační měsíční potenciál úspory: ${formatCurrency(impact.monthlySavingsPotential)}`,
+        `- Stav čísel: ${impactVerificationLabel()}`,
+        "",
+        "## Doporučený další krok",
+        `- ${nextStep.label}`,
+        `- ${clientNextStepDetail(nextStep)}`,
+        "",
+        "## Fáze 0",
+        `- Název: ${diagnosticPackage.name}`,
+        `- Cena: ${diagnosticPackage.price} bez DPH`,
+        `- Délka: ${diagnosticPackage.duration}`,
+        `- Výstup: ${phaseZero.output || diagnosticPackage.outputs.join("; ")}`,
+        "",
+        "## Co od vás potřebujeme",
+        clientInputs.length ? clientInputs.map((item) => `- ${item}`).join("\n") : "- Procesní popis, ukázky dat a kontakt na odpovědnou osobu."
+      ].join("\n");
+    }
+
+    function clientVerificationLines(riskRadar, dataReadiness) {
+      const lines = riskRadar
+        .filter((risk) => risk.level >= 2)
+        .map((risk) => `- ${risk.label}: ${risk.action}`);
+      if (dataReadiness.score < 70 && dataReadiness.checks.length) {
+        lines.push("- Data: potvrdit dostupnost, vlastníka, kvalitu, právní titul a API/export.");
+      }
+      if (!lines.length) lines.push("- Upřesnit scope, prioritu a měření návratnosti před návrhem řešení.");
+      return lines.join("\n");
+    }
+
+    function analystQuestions() {
+      const questions = [];
+      if (state.selectedAreas.includes("integration")) questions.push("- Dostupnost API dokumentace, sandboxu a technického kontaktu dodavatele.");
+      if (state.selectedAreas.includes("backend")) questions.push("- Datový model, role, oprávnění, audit log a retence.");
+      if (state.selectedAreas.includes("devops")) questions.push("- Hosting, monitoring, zálohy, RTO/RPO, CI/CD a incident proces.");
+      if (state.selectedAreas.includes("security")) questions.push("- Typ dat, právní požadavky, role, audit, DPA a bezpečnostní pravidla klienta.");
+      if (state.selectedAreas.includes("ai")) questions.push("- Kvalita a dostupnost dat, metrika úspěchu a human-in-the-loop kontrola.");
+      if (state.selectedAreas.includes("maintenance")) questions.push("- Repozitář, dokumentace, přístupy, historie incidentů a backlog.");
+      if (questions.length === 0) questions.push("- Zpřesnit scope první fáze a otevřené technické předpoklady.");
+      return questions.join("\n");
+    }
+
+    function nextStepFor(score, risks) {
+      if (risks.some((risk) => risk.includes("security/compliance"))) return "Zapojit security/compliance a připravit placenou diagnostiku nebo doplnění vstupů před nabídkou.";
+      if (score.total >= 80) return "Rozhodnout rychlá nabídka vs. placená diagnostika podle technických rizik.";
+      if (score.total >= 60) return "Ověřit scope a vybrat jeden z pěti dalších kroků.";
+      if (score.total >= 40) return "Doplnit vstupy nebo nabídnout placenou diagnostiku.";
+      return "Zařadit do nurturingu nebo stop, pokud není rozpočet, rozhodovatel ani jasná bolest.";
+    }
+
+    function render() {
+      setError("");
+      if (state.step === 1 && lastRenderedStep !== 1) {
+        step1Sub = "a";
+      }
+      lastRenderedStep = state.step;
+      renderProgress();
+      renderMiniSummary();
+      renderLiveExecutiveSummary();
+      renderSavedList();
+      const root = document.getElementById("stepRoot");
+
+      if (state.step === 1) root.innerHTML = renderStep1();
+      if (state.step === 2) root.innerHTML = renderStep2();
+      if (state.step === 3) root.innerHTML = renderStep3();
+      if (state.step === 4) root.innerHTML = renderStep4();
+      if (state.step === 5) root.innerHTML = renderStep5();
+
+      bindCurrentStep();
+    }
+
+    function renderProgress() {
+      const isStep1A = state.step === 1 && step1Sub === "a";
+      const isStep1B = state.step === 1 && step1Sub === "b";
+      document.getElementById("stepLabel").textContent = isStep1A
+        ? `Krok 1 ze ${stepNames.length} · část A`
+        : isStep1B
+          ? `Krok 1 ze ${stepNames.length} · část B`
+          : `Krok ${state.step} z ${stepNames.length}`;
+      document.getElementById("stepName").textContent = isStep1A
+        ? "Kontext a firma"
+        : isStep1B
+          ? "BANT a rozhodovatelé"
+          : stepNames[state.step - 1];
+      document.getElementById("progressFill").style.width = isStep1A ? "10%" : isStep1B ? "20%" : `${(state.step / stepNames.length) * 100}%`;
+      document.getElementById("syncStatus").textContent = API_BASE_URL ? "Serverový režim" : "Lokální režim - server připraven";
+      document.getElementById("stepper").innerHTML = stepNames.map((name, index) => {
+        const step = index + 1;
+        const stateClass = step === state.step ? "active" : step < state.step ? "done" : "";
+        return `<div class="step-item ${stateClass}"><strong>${step}. ${escapeHtml(name)}</strong><span>${step < state.step ? "Dokončeno" : step === state.step ? "Právě teď" : "Čeká"}</span></div>`;
+      }).join("");
+    }
+
+    function renderMiniSummary() {
+      const score = calculateScore();
+      const impact = calculateImpact();
+      const fit = calculateFitMeter(score, calculateRisks(), impact);
+      const items = [
+        ["Firma", state.company.name || "Nevyplněno"],
+        ["Kontakt", state.company.contactName || "Nevyplněno"],
+        ["Rozpočet", budgetLabel(state.bant.budget)],
+        ["Roční dopad", impact.annualLoss ? formatCurrency(impact.annualLoss) : "Nevyplněno"],
+        ["Termín", formatDate(state.bant.targetDate)],
+        ["Oblasti", selectedAreaTitles().length ? selectedAreaTitles().join(", ") : "Nevybráno"],
+        ["Skóre", `${score.total}/100`],
+        ["Fit", fit.label]
+      ];
+      document.getElementById("miniSummary").innerHTML = items.map(([label, value]) => (
+        `<li><span>${label}</span><strong>${escapeHtml(value)}</strong></li>`
+      )).join("");
+    }
+
+    function renderLiveExecutiveSummary() {
+      const score = calculateScore();
+      const impact = calculateImpact();
+      const risks = calculateRisks();
+      const fit = calculateFitMeter(score, risks, impact);
+      const company = state.company.name || "Klient";
+      const pain = state.impact.currentPain || "problém zatím není popsaný";
+      const nextStep = recommendedNextStep(score, risks, impact, calculateDataReadiness());
+      document.getElementById("liveExecutiveSummary").innerHTML = `
+        <strong>${escapeHtml(company)}</strong>: ${escapeHtml(pain)}.
+        Dopad ${impact.annualLoss ? escapeHtml(formatCurrency(impact.annualLoss)) : "zatím nevyčíslen"}.
+        Fit: <strong>${escapeHtml(fit.label)}</strong>.
+        Další krok: ${escapeHtml(nextStep.label)}
+      `;
+    }
+
+    function renderSavedList() {
+      const box = document.getElementById("savedList");
+      if (!recordsCache.length) {
+        box.innerHTML = '<p class="empty">Zatím nejsou uložené žádné intaky.</p>';
+        return;
+      }
+      box.innerHTML = recordsCache.slice(0, 8).map((record) => `
+        <button class="saved-item" data-load-id="${escapeHtml(record.id)}" type="button">
+          <strong>${escapeHtml(record.company?.name || "Bez názvu firmy")}</strong>
+          <span><span class="status-badge ${statusClass(record.status || "draft")}">${escapeHtml(statusLabel(record.status || "draft"))}</span></span>
+          <span>${new Date(record.updatedAt).toLocaleString("cs-CZ")}</span>
+        </button>
+      `).join("");
+      box.querySelectorAll("[data-load-id]").forEach((button) => {
+        button.addEventListener("click", () => loadRecord(button.dataset.loadId));
+      });
+    }
+
+    function statusLabel(status) {
+      return {
+        draft: "Draft",
+        completed: "Dokončeno",
+        handoff_ready: "Handoff ready",
+        archived: "Archiv"
+      }[status] || status;
+    }
+
+    function statusClass(status) {
+      return ["draft", "completed", "handoff_ready", "archived"].includes(status) ? status : "draft";
+    }
+
+    function renderStep1() {
+      return step1Sub === "a" ? renderStep1A() : renderStep1B();
+    }
+
+    function renderStep1A() {
+      return `
+        <h2>Krok 1A: Kontext a firma</h2>
+        <p class="intro">Nejdřív zapiš rámec schůzky a základní kontakt. Bez validace, jen příprava pro BANT část.</p>
+        <div class="section">
+          <h3>Meeting Context</h3>
+          <div class="grid two">
+            <div>
+              <label for="meetingModeSelect">Typ schůzky</label>
+              <select id="meetingModeSelect">
+                <option value="onsite" ${state.meetingContext.mode === "onsite" ? "selected" : ""}>On-site u zákazníka</option>
+                <option value="online" ${state.meetingContext.mode === "online" ? "selected" : ""}>Online / telefon</option>
+                <option value="internal" ${state.meetingContext.mode === "internal" ? "selected" : ""}>Interní doplnění po schůzce</option>
+              </select>
+            </div>
+            <div>
+              <label for="customerSegment">Typ zákazníka</label>
+              <input id="customerSegment" type="text" value="${escapeHtml(state.meetingContext.customerSegment)}" placeholder="SMB služby/provoz">
+            </div>
+            <div>
+              <label for="initiatedBy">Kdo inicioval kontakt</label>
+              <input id="initiatedBy" type="text" value="${escapeHtml(state.meetingContext.initiatedBy)}" placeholder="Klient, doporučení, outbound, partner...">
+            </div>
+            <div>
+              <label for="attendees">Kdo je na schůzce</label>
+              <input id="attendees" type="text" value="${escapeHtml(state.meetingContext.attendees)}" placeholder="Jednatel, provoz, IT, účetní...">
+            </div>
+            <div>
+              <label for="meetingGoal">Co má být výstup schůzky</label>
+              <input id="meetingGoal" type="text" value="${escapeHtml(state.meetingContext.meetingGoal)}" placeholder="Ověřit fit, najít úspory, domluvit diagnostiku...">
+            </div>
+            <div>
+              <label for="companyName">Název firmy</label>
+              <input id="companyName" type="text" value="${escapeHtml(state.company.name)}" autocomplete="organization">
+            </div>
+            <div>
+              <label for="contactName">Jméno kontaktu</label>
+              <input id="contactName" type="text" value="${escapeHtml(state.company.contactName)}" autocomplete="name">
+            </div>
+            <div>
+              <label for="contactRole">Role kontaktu</label>
+              <input id="contactRole" type="text" value="${escapeHtml(state.company.contactRole)}" placeholder="Jednatel, IT, provoz, marketing...">
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" type="button" onclick="goStep1B()">Dál: BANT →</button>
+          <button class="btn" id="saveDraftBtn" type="button">Uložit intake</button>
+          <button class="btn danger" id="newBtn" type="button">Nový intake</button>
+        </div>
+      `;
+    }
+
+    function renderStep1B() {
+      return `
+        <h2>Krok 1B: BANT a rozhodovatelé</h2>
+        <p class="intro">Teď ověř rozpočet, termín a rozhodovací mapu. Tato část se validuje před pokračováním do kroku 2.</p>
+        <div class="grid two">
+          <div>
+            <label for="targetDate">Target go-live datum</label>
+            <input id="targetDate" type="date" value="${escapeHtml(state.bant.targetDate)}">
+          </div>
+          <div>
+            <label>Jednám přímo s rozhodovatelem?</label>
+            <div class="toggle" role="group" aria-label="Rozhodovatel">
+              <button type="button" data-decision="true" class="${state.bant.decisionMakerAccess === true ? "active" : ""}">Ano</button>
+              <button type="button" data-decision="false" class="${state.bant.decisionMakerAccess === false ? "active" : ""}">Ne</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <label>Rozpočet</label>
+          <div class="choice-grid two">
+            ${budgetChoice("<100k", "<100k Kč", "Nízký fit, typicky nurturing nebo malý scope.")}
+            ${budgetChoice("100-300k", "100k-300k Kč", "Menší příležitost, nutné držet scope.")}
+            ${budgetChoice("300k-1M", "300k-1M Kč", "Cílový rozsah pro discovery a nabídku.")}
+            ${budgetChoice("1M+", "1M+ Kč", "Prioritní potenciál, nutná silná kvalifikace.")}
+          </div>
+        </div>
+
+        <div class="section">
+          <label for="leadSourceScore">Zdroj leadu</label>
+          <select id="leadSourceScore">
+            ${leadSourceOptions.map((option) => `
+              <option data-value="${option.score}" ${Number(state.leadSourceScore) === option.score ? "selected" : ""}>${escapeHtml(option.label)}</option>
+            `).join("")}
+          </select>
+        </div>
+
+        <div class="section">
+          <h3>Decision Maker Map</h3>
+          <div class="grid two">
+            <div>
+              <label for="economicBuyer">Ekonomický buyer</label>
+              <input id="economicBuyer" type="text" value="${escapeHtml(state.decisionMap.economicBuyer)}" placeholder="Kdo drží rozpočet">
+            </div>
+            <div>
+              <label for="technicalBuyer">Technický buyer</label>
+              <input id="technicalBuyer" type="text" value="${escapeHtml(state.decisionMap.technicalBuyer)}" placeholder="IT / architekt / dodavatel">
+            </div>
+            <div>
+              <label for="businessUser">Hlavní uživatel</label>
+              <input id="businessUser" type="text" value="${escapeHtml(state.decisionMap.user)}" placeholder="Tým nebo role, která proces používá">
+            </div>
+            <div>
+              <label for="champion">Champion</label>
+              <input id="champion" type="text" value="${escapeHtml(state.decisionMap.champion)}" placeholder="Kdo změnu tlačí">
+            </div>
+            <div>
+              <label for="blocker">Blocker</label>
+              <input id="blocker" type="text" value="${escapeHtml(state.decisionMap.blocker)}" placeholder="Kdo nebo co může projekt zastavit">
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" type="button" onclick="goStep1A()">Zpět</button>
+          <button class="btn primary" id="continueBtn" type="button">Pokračovat -></button>
+          <button class="btn" id="saveDraftBtn" type="button">Uložit intake</button>
+          <button class="btn danger" id="newBtn" type="button">Nový intake</button>
+        </div>
+      `;
+    }
+
+    function budgetChoice(value, title, description) {
+      const checked = state.bant.budget === value ? "checked" : "";
+      return `
+        <label class="choice">
+          <input type="radio" name="budget" value="${value}" ${checked}>
+          <span><strong>${title}</strong><span>${description}</span></span>
+        </label>
+      `;
+    }
+
+    function renderStep2() {
+      const impact = calculateImpact();
+      return `
+        <h2>Krok 2: Dopad problému</h2>
+        <p class="intro">Vyčísli, kolik času a výjimek současný proces spotřebuje. Výpočet je orientační, ale dá schůzce jasný ekonomický rámec.</p>
+        <div class="grid two">
+          <div>
+            <label for="peopleCount">Počet lidí v procesu</label>
+            <input id="peopleCount" type="number" min="0" value="${escapeHtml(state.impact.peopleCount)}" placeholder="Např. 4">
+          </div>
+          <div>
+            <label for="hoursPerWeek">Hodin týdně na osobu</label>
+            <input id="hoursPerWeek" type="number" min="0" step="0.5" value="${escapeHtml(state.impact.hoursPerWeek)}" placeholder="Např. 6">
+          </div>
+          <div>
+            <label for="hourlyRate">Odhad hodinové sazby / nákladu</label>
+            <input id="hourlyRate" type="number" min="0" value="${escapeHtml(state.impact.hourlyRate)}" placeholder="Např. 700">
+          </div>
+          <div>
+            <label for="monthlyExceptions">Výjimky nebo chyby měsíčně</label>
+            <input id="monthlyExceptions" type="number" min="0" value="${escapeHtml(state.impact.monthlyExceptions)}" placeholder="Např. 12">
+          </div>
+          <div>
+            <label for="exceptionCost">Náklad jedné výjimky / zdržení</label>
+            <input id="exceptionCost" type="number" min="0" value="${escapeHtml(state.impact.exceptionCost)}" placeholder="Např. 2500">
+          </div>
+          <div>
+            <label>Orientační výsledek</label>
+            <div class="metric">
+              <span>Roční ztráta</span>
+              <strong>${formatCurrency(impact.annualLoss)}</strong>
+              <em>Měsíční potenciál úspory: ${formatCurrency(impact.monthlySavingsPotential)}</em>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <label class="choice">
+            <input id="impactUnverified" type="checkbox" ${state.impact.unverified ? "checked" : ""}>
+            <span><strong>Dopad je obchodní odhad</strong><span>Zaškrtni, pokud klient nechtěl nebo neuměl čísla přesně potvrdit.</span></span>
+          </label>
+        </div>
+
+        <div class="section">
+          <label for="currentPain">Jak se problém projevuje v provozu</label>
+          <textarea id="currentPain" placeholder="Ruční přepisování, čekání na schválení, chyby ve fakturaci, výpadky, nespokojenost zákazníků...">${escapeHtml(state.impact.currentPain)}</textarea>
+        </div>
+
+        <div class="actions">
+          <button class="btn" id="backBtn" type="button">Zpět</button>
+          <button class="btn primary" id="continueBtn" type="button">Pokračovat -></button>
+          <button class="btn" id="saveDraftBtn" type="button">Uložit intake</button>
+        </div>
+      `;
+    }
+
+    function renderStep3() {
+      const impliedAreas = impliedAreaIdsFromSignals();
+      return `
+        <h2>Krok 3: Výběr oblastí služeb</h2>
+        <p class="intro">Projdi ano/ne strom podle toho, co klient skutečně řekl. Matice automaticky zapne oblasti, role a handoff; ruční výběr dole slouží ke korekci.</p>
+        <div class="signal-grid">
+          ${decisionSignals.map((signal) => signalCard(signal)).join("")}
+        </div>
+        <p class="auto-note">Automaticky navržené oblasti: ${impliedAreas.length ? impliedAreas.map((id) => escapeHtml(areaById(id)?.title || id)).join(", ") : "zatím žádné"}.</p>
+        <div class="section">
+          <h3>Finální oblasti pro diagnostiku</h3>
+          <p class="intro">Nech zaškrtnuté jen oblasti, které mají reálný signál a další otázky pro tým.</p>
+        <div class="choice-grid two">
+          ${serviceAreas.map((area) => `
+            <label class="choice">
+              <input type="checkbox" name="area" value="${area.id}" ${state.selectedAreas.includes(area.id) ? "checked" : ""}>
+              <span><strong>${area.number}. ${area.title}</strong><span>${area.description}</span></span>
+            </label>
+          `).join("")}
+        </div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="backBtn" type="button">Zpět</button>
+          <button class="btn primary" id="continueBtn" type="button">Pokračovat -></button>
+          <button class="btn" id="saveDraftBtn" type="button">Uložit intake</button>
+        </div>
+      `;
+    }
+
+    function signalCard(signal) {
+      const active = state.selectedSignals.includes(signal.id);
+      return `
+        <div class="signal-card ${active ? "active" : ""}">
+          <div>
+            <strong>${escapeHtml(signal.question)}</strong>
+            <span>${escapeHtml(active ? signal.yes : signal.no)}</span>
+          </div>
+          <div class="signal-actions" role="group" aria-label="${escapeHtml(signal.question)}">
+            <button type="button" data-signal="${escapeHtml(signal.id)}" data-signal-choice="true" class="${active ? "active" : ""}">Ano</button>
+            <button type="button" data-signal="${escapeHtml(signal.id)}" data-signal-choice="false" class="${!active ? "active" : ""}">Ne</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleDecisionSignal(signalId, enabled) {
+      const currentAreas = Array.from(document.querySelectorAll('input[name="area"]:checked')).map((input) => input.value);
+      const previousImpliedAreas = impliedAreaIdsFromSignals();
+      const nextSignals = enabled
+        ? uniqueValues([...state.selectedSignals, signalId])
+        : state.selectedSignals.filter((id) => id !== signalId);
+      const nextImpliedAreas = impliedAreaIdsFromSignals(nextSignals);
+      const manuallyKeptAreas = currentAreas.filter((id) => !previousImpliedAreas.includes(id) || nextImpliedAreas.includes(id));
+      state.selectedSignals = nextSignals;
+      state.selectedAreas = uniqueValues([...manuallyKeptAreas, ...nextImpliedAreas]);
+      state.diagnosticIndex = Math.min(state.diagnosticIndex, Math.max(0, state.selectedAreas.length - 1));
+      render();
+    }
+
+    function renderStep4() {
+      if (!state.selectedAreas.length) {
+        return `
+          <h2>Krok 4: Dynamická diagnostika</h2>
+          <p class="intro">Nejdřív vyber alespoň jednu oblast.</p>
+          <div class="actions"><button class="btn" id="backBtn" type="button">Zpět</button></div>
+        `;
+      }
+      const areaId = state.selectedAreas[state.diagnosticIndex] || state.selectedAreas[0];
+      const area = areaById(areaId);
+      if (!area) {
+        return `
+          <h2>Krok 4: Dynamická diagnostika</h2>
+          <p class="intro">Vybraná oblast už v matici neexistuje. Vrať se a uprav výběr oblastí.</p>
+          <div class="actions"><button class="btn" id="backBtn" type="button">Zpět</button></div>
+        `;
+      }
+      const answers = state.diagnostics[area.id]?.answers || {};
+      const chips = state.selectedAreas.map((id, index) => {
+        const selectedArea = areaById(id);
+        const cls = index === state.diagnosticIndex ? "chip active" : "chip";
+        return selectedArea ? `<span class="${cls}">${selectedArea.number}. ${escapeHtml(selectedArea.title)}</span>` : "";
+      }).join("");
+
+      return `
+        <h2>Krok 4: ${area.title}</h2>
+        <p class="area-count">Oblast ${state.diagnosticIndex + 1} z ${state.selectedAreas.length}. Další oblast se zobrazí až po odeslání této.</p>
+        <div class="chips">${chips}</div>
+        <div class="diagnostic-panel">
+          <h3>${escapeHtml(area.description)}</h3>
+          <div class="grid">
+            ${area.questions.map((question) => `
+              <div>
+                <label for="${question.key}">${question.label}</label>
+                <textarea id="${question.key}" data-question-key="${question.key}" placeholder="Stručná poznámka ze schůzky...">${escapeHtml(answers[question.key] || "")}</textarea>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="backBtn" type="button">Zpět</button>
+          <button class="btn primary" id="continueBtn" type="button">${state.diagnosticIndex + 1 === state.selectedAreas.length ? "Vyhodnotit ->" : "Další oblast ->"}</button>
+          <button class="btn" id="saveDraftBtn" type="button">Uložit intake</button>
+        </div>
+      `;
+    }
+
+    function renderStep5() {
+      const score = calculateScore();
+      const roles = calculateRoles();
+      const risks = calculateRisks();
+      const impact = calculateImpact();
+      const riskRadar = calculateRiskRadar();
+      const dataReadiness = calculateDataReadiness();
+      const fit = calculateFitMeter(score, risks, impact);
+      const phaseZero = phaseZeroProposal(risks, dataReadiness);
+      const teamAssignments = calculateTeamAssignments(roles);
+      const missingInputs = calculateMissingInputs(dataReadiness);
+      const nextStep = recommendedNextStep(score, risks, impact, dataReadiness);
+      const decisions = nextStepOptions(nextStep, score, risks, impact, dataReadiness, missingInputs);
+      const gtmClassification = calculateGtmClassification(score, risks, impact, nextStep);
+      const outputs = buildOutputs(score, roles, risks, impact, riskRadar, dataReadiness, fit, phaseZero, teamAssignments, missingInputs, nextStep, gtmClassification);
+      const badgeClass = recommendationClass(score.total);
+      const modeActions = `
+        <div class="output-mode-actions">
+          <p>${outputMode === "client" ? "Klientský pohled skrývá interní kvalifikaci a nechává jen problém, dopad, Fázi 0 a vstupy od klienta." : "Interní režim obsahuje kvalifikaci, rizika, role, GTM a handoff pro tým."}</p>
+          <div class="actions" style="margin-top:0">
+            <button class="btn ${outputMode === "client" ? "" : "primary"}" id="internalModeBtn" type="button">Interní režim</button>
+            <button class="btn ${outputMode === "client" ? "primary" : ""}" id="clientSummaryBtn" type="button">Zobrazit klientské shrnutí</button>
+          </div>
+        </div>
+      `;
+      const strategicExceptionBlock = score.total < 40 ? `
+        <div class="phase-zero">
+          <h3>Nízké skóre — strategická výjimka?</h3>
+          <p>Skóre je pod 40. Pokud má zakázka strategickou hodnotu (referenční zákazník, vstup k větší skupině, partnerský deal), vyplň důvod níže. PM to zohlední při rozhodnutí.</p>
+          <label for="strategicExceptionReason">Důvod strategické výjimky</label>
+          <textarea id="strategicExceptionReason" oninput="updateStrategicExceptionReason(this.value)" placeholder="Např. referenční zákazník, vstup k větší skupině, partnerský deal...">${escapeHtml(state.strategicExceptionReason)}</textarea>
+        </div>
+      ` : "";
+      if (outputMode === "client") {
+        return `
+          <h2>Krok 5: Klientské shrnutí</h2>
+          <p class="intro">Tento pohled je určený k ukázání klientovi na konci schůzky. Neobsahuje interní kvalifikaci ani týmové hodnocení.</p>
+          ${modeActions}
+          ${renderClientSummaryPanel(impact, nextStep, phaseZero, outputs.clientOnePager)}
+          <div class="actions">
+            <button class="btn" id="backBtn" type="button">Zpět</button>
+            <button class="btn primary" id="saveCompletedBtn" type="button">Uložit jako dokončené</button>
+            <button class="btn" id="exportBtn" type="button">Export JSON</button>
+            <button class="btn danger" id="newBtn" type="button">Nový intake</button>
+          </div>
+        `;
+      }
+      return `
+        <h2>Krok 5: Finální vyhodnocení a handoff</h2>
+        <p class="intro">Výstup je připravený ke zkopírování do CRM, Notionu nebo k předání PM a analytikovi. Klientovi ukazuj jen klientské shrnutí.</p>
+        ${modeActions}
+        <div class="output-grid">
+          <div class="metric-grid">
+            <div class="metric">
+              <span>Roční ztráta</span>
+              <strong>${formatCurrency(impact.annualLoss)}</strong>
+              <em>Ruční práce + výjimky a zdržení.</em>
+            </div>
+            <div class="metric">
+              <span>Potenciál měsíční úspory</span>
+              <strong>${formatCurrency(impact.monthlySavingsPotential)}</strong>
+              <em>Pracovní odhad 55 % obnovitelného dopadu.</em>
+            </div>
+            <div class="metric">
+              <span>Doporučený typ projektu</span>
+              <strong>${escapeHtml(impact.projectType)}</strong>
+              <em>Navázáno na dopad a zvolené oblasti.</em>
+            </div>
+            <div class="metric">
+              <span>Primární nabídka Velios</span>
+              <strong>${escapeHtml(primaryOffer)}</strong>
+              <em>Weby, integrace, systémy a AI jsou prostředky podle problému.</em>
+            </div>
+          </div>
+
+          <div class="score-card">
+            <div class="score-number">${score.total}</div>
+            <div>
+              <h3>Deal score</h3>
+              <p><span class="badge ${badgeClass}">${score.recommendation}</span></p>
+              <table>
+                <tr><th>Faktor</th><th>Skóre</th></tr>
+                <tr><td>Offer fit</td><td>${score.offerFit}/20</td></tr>
+                <tr><td>Deal size</td><td>${score.dealSize}/20</td></tr>
+                <tr><td>Přístup k rozhodovateli</td><td>${score.decisionMaker}/20</td></tr>
+                <tr><td>Timeline urgency</td><td>${score.timeline}/20</td></tr>
+                <tr><td>Lead source</td><td>${score.leadSource}/20</td></tr>
+              </table>
+              ${risks.length ? `<ul class="risk-list">${risks.map((risk) => `<li>${escapeHtml(risk)}</li>`).join("")}</ul>` : ""}
+            </div>
+          </div>
+
+          <div class="fit-grid">
+            <div class="metric">
+              <span>VELYOS Fit Meter</span>
+              <strong><span class="badge ${fit.className}">${escapeHtml(fit.label)}</span></strong>
+              <em>${escapeHtml(fit.detail)}</em>
+            </div>
+            <div class="metric">
+              <span>Data Readiness</span>
+              <strong>${dataReadiness.applicable ? `${dataReadiness.score}/100` : "N/A"}</strong>
+              <em>${escapeHtml(dataReadiness.label)}</em>
+            </div>
+            <div class="metric">
+              <span>Dává smysl diagnostika?</span>
+              <strong>${phaseZero.title.includes("Fáze 0") ? "Ano" : "Standardní discovery"}</strong>
+              <em>${escapeHtml(phaseZero.duration)} - ${escapeHtml(phaseZero.roles)}</em>
+            </div>
+            <div class="metric">
+              <span>Doporučený další krok</span>
+              <strong>${escapeHtml(nextStep.label)}</strong>
+              <em>${escapeHtml(nextStep.detail)}</em>
+            </div>
+          </div>
+
+          <div class="fit-grid">
+            <div class="metric">
+              <span>ICP fit</span>
+              <strong><span class="badge ${gtmClassification.icpFit.className}">${escapeHtml(gtmClassification.icpFit.label)}</span></strong>
+              <em>${gtmClassification.icpFit.score}/${gtmClassification.icpFit.maxScore} pro ${escapeHtml(gtmClassification.strategy.primaryIcp)}.</em>
+            </div>
+            <div class="metric">
+              <span>Outbound segment</span>
+              <strong>${escapeHtml(gtmClassification.outboundSegment)}</strong>
+              <em>${escapeHtml(gtmClassification.strategy.motion)} | ${escapeHtml(gtmClassification.strategy.ninetyDayGoal)}.</em>
+            </div>
+            <div class="metric">
+              <span>Obchodní asset</span>
+              <strong>${escapeHtml(gtmClassification.recommendedSalesAsset)}</strong>
+              <em>Co použít pro další follow-up nebo nabídku.</em>
+            </div>
+            <div class="metric">
+              <span>Case study potenciál</span>
+              <strong>${escapeHtml(gtmClassification.caseStudyPotential.label)}</strong>
+              <em>${escapeHtml(gtmClassification.caseStudyPotential.reason)}</em>
+            </div>
+          </div>
+
+          <div>
+            <h3>Decision rules: další krok</h3>
+            <div class="decision-grid">
+              ${decisions.map((option) => `
+                <div class="decision-card ${option.active ? "active" : ""}">
+                  <strong>${escapeHtml(option.label)}</strong>
+                  <span>${escapeHtml(option.detail)}</span>
+                  <em>${option.active ? "Doporučeno" : option.available ? "Možné" : "Nepoužít teď"}</em>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+
+          <div>
+            <h3>Risk Radar</h3>
+            <div class="radar-grid">
+              ${riskRadar.map((risk) => riskRadarItem(risk)).join("")}
+            </div>
+          </div>
+
+          <div class="phase-zero">
+            <h3>${escapeHtml(phaseZero.title)}</h3>
+            <p>${phaseZero.price ? `<strong>Cena:</strong> ${escapeHtml(phaseZero.price)} | ` : ""}<strong>Délka:</strong> ${escapeHtml(phaseZero.duration)} | <strong>Role:</strong> ${escapeHtml(phaseZero.roles)}</p>
+            <p><strong>Výstup:</strong> ${escapeHtml(phaseZero.output)}</p>
+            <p><strong>Klient dodá:</strong> ${escapeHtml(phaseZero.clientInputs)}</p>
+          </div>
+
+          <div>
+            <h3>Role matrix</h3>
+            <table>
+              <tr><th>Zapojit</th><th>Nezapojovat</th></tr>
+              <tr>
+                <td><div class="role-cell">${roles.involve.map((role) => `<span class="chip active">${escapeHtml(role)}</span>`).join("") || "Bez rolí"}</div></td>
+                <td><div class="role-cell">${roles.doNotInvolve.map((role) => `<span class="chip">${escapeHtml(role)}</span>`).join("") || "Bez vyloučených rolí"}</div></td>
+              </tr>
+            </table>
+          </div>
+
+          <div>
+            <h3>Týmové assignmenty</h3>
+            <table>
+              <tr><th>Role</th><th>Owner ve Velios</th><th>Co má řešit</th></tr>
+              ${teamAssignments.map((item) => `
+                <tr>
+                  <td>${escapeHtml(item.role)}</td>
+                  <td>${escapeHtml(item.owner)}</td>
+                  <td>${escapeHtml(item.responsibility)}</td>
+                </tr>
+              `).join("") || '<tr><td colspan="3">Zatím není koho zapojit.</td></tr>'}
+            </table>
+          </div>
+
+          <div class="phase-zero">
+            <h3>Chybějící vstupy před nabídkou / diagnostikou</h3>
+            ${missingInputs.length ? `<ul>${missingInputs.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : "<p>Žádné zásadní chybějící vstupy z aktuálního intake.</p>"}
+          </div>
+
+          ${strategicExceptionBlock}
+          ${briefBlock("CRM zápis", "crmSummary", outputs.crmSummary)}
+          ${briefBlock("Shrnutí pro klienta", "clientOnePager", outputs.clientOnePager, "client-output")}
+          ${briefBlock("Handoff: obchodník -> PM", "pmBrief", outputs.pmBrief)}
+          ${briefBlock("Handoff: obchodník -> technický analytik", "analystBrief", outputs.analystBrief)}
+          ${briefBlock("Follow-up e-mail klientovi", "followUpEmail", outputs.followUpEmail)}
+
+          <div>
+            <h3>Opportunity Timeline</h3>
+            <div class="timeline">
+              ${opportunityTimeline().map((item) => `
+                <div class="timeline-item">
+                  <strong>${escapeHtml(item.step)}</strong>
+                  <span>${escapeHtml(item.duration)} | ${escapeHtml(item.owner)}<br>${escapeHtml(item.note)}</span>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="backBtn" type="button">Zpět</button>
+          <button class="btn primary" id="saveCompletedBtn" type="button">Uložit jako dokončené</button>
+          <button class="btn" id="exportBtn" type="button">Export JSON</button>
+          <button class="btn danger" id="newBtn" type="button">Nový intake</button>
+        </div>
+      `;
+    }
+
+    function renderClientSummaryPanel(impact, nextStep, phaseZero, clientOnePager) {
+      const clientInputs = clientInputsForSummary(phaseZero);
+      return `
+        <div class="client-summary-panel">
+          <div class="client-summary-hero">
+            <h3>${escapeHtml(state.company.name || "Klient")}</h3>
+            <p>${escapeHtml(state.impact.currentPain || "Doplníme popis provozního problému v dalším kroku.")}</p>
+          </div>
+          <div class="metric-grid">
+            <div class="metric">
+              <span>Orientační roční náklad</span>
+              <strong>${formatCurrency(impact.annualLoss)}</strong>
+              <em>${escapeHtml(impactVerificationLabel())}</em>
+            </div>
+            <div class="metric">
+              <span>Potenciál měsíční úspory</span>
+              <strong>${formatCurrency(impact.monthlySavingsPotential)}</strong>
+              <em>Pracovní odhad podle popsaného procesu.</em>
+            </div>
+            <div class="metric">
+              <span>Doporučený další krok</span>
+              <strong>${escapeHtml(nextStep.label)}</strong>
+              <em>${escapeHtml(clientNextStepDetail(nextStep))}</em>
+            </div>
+          </div>
+          <div class="phase-zero">
+            <h3>${escapeHtml(diagnosticPackage.name)}</h3>
+            <p><strong>Cena:</strong> ${escapeHtml(diagnosticPackage.price)} bez DPH | <strong>Délka:</strong> ${escapeHtml(diagnosticPackage.duration)}</p>
+            <p><strong>Výstup:</strong> ${escapeHtml(phaseZero.output || diagnosticPackage.outputs.join("; "))}</p>
+          </div>
+          <div class="phase-zero">
+            <h3>Co klient dodá</h3>
+            <ul>
+              ${(clientInputs.length ? clientInputs : ["Procesní popis", "Ukázky dat", "Kontakt na odpovědnou osobu"]).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+            </ul>
+          </div>
+          ${briefBlock("Text ke zkopírování pro klienta", "clientOnePager", clientOnePager, "client-output")}
+        </div>
+      `;
+    }
+
+    function updateStrategicExceptionReason(value) {
+      state.strategicExceptionReason = String(value || "").trim();
+      const outputs = buildRecord(state.currentStatus).outputs;
+      const crmSummary = document.getElementById("crmSummary");
+      if (crmSummary) crmSummary.value = outputs.crmSummary;
+      const pmBrief = document.getElementById("pmBrief");
+      if (pmBrief) pmBrief.value = outputs.pmBrief;
+    }
+
+    function riskRadarItem(risk) {
+      const meterClass = risk.level >= 3 ? "high" : risk.level >= 2 ? "medium" : "";
+      const width = Math.max(8, risk.level * 33);
+      return `
+        <div class="radar-item">
+          <strong>${escapeHtml(risk.label)}</strong>
+          <div>
+            <span class="badge ${risk.level >= 3 ? "danger" : risk.level >= 2 ? "warning" : "success"}">${risk.level}/3</span>
+            <div class="risk-meter ${meterClass}"><span style="width: ${width}%"></span></div>
+            <span>${escapeHtml(risk.action)}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function briefBlock(title, id, content, className = "") {
+      return `
+        <div class="brief ${className}">
+          <div class="brief-head">
+            <h3>${title}</h3>
+            <button class="btn" data-copy-target="${id}" type="button">Kopírovat</button>
+          </div>
+          <textarea id="${id}" readonly>${escapeHtml(content)}</textarea>
+        </div>
+      `;
+    }
+
+    function goStep1A() {
+      readStep1();
+      step1Sub = "a";
+      render();
+    }
+
+    function goStep1B() {
+      readStep1();
+      step1Sub = "b";
+      render();
+    }
+
+    function bindCurrentStep() {
+      const meetingModeBtn = document.getElementById("meetingModeBtn");
+      if (meetingModeBtn) {
+        meetingModeBtn.onclick = toggleMeetingMode;
+      }
+
+      const demoBtn = document.getElementById("demoBtn");
+      if (demoBtn) {
+        demoBtn.onclick = loadDemo;
+      }
+
+      const internalModeBtn = document.getElementById("internalModeBtn");
+      if (internalModeBtn) {
+        internalModeBtn.addEventListener("click", () => {
+          outputMode = "internal";
+          render();
+        });
+      }
+
+      const clientSummaryBtn = document.getElementById("clientSummaryBtn");
+      if (clientSummaryBtn) {
+        clientSummaryBtn.addEventListener("click", () => {
+          outputMode = "client";
+          render();
+        });
+      }
+
+      document.querySelectorAll("[data-decision]").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.bant.decisionMakerAccess = button.dataset.decision === "true";
+          render();
+        });
+      });
+
+      document.querySelectorAll("[data-signal]").forEach((button) => {
+        button.addEventListener("click", () => {
+          toggleDecisionSignal(button.dataset.signal, button.dataset.signalChoice === "true");
+        });
+      });
+
+      const continueBtn = document.getElementById("continueBtn");
+      if (continueBtn) continueBtn.addEventListener("click", handleContinue);
+
+      const backBtn = document.getElementById("backBtn");
+      if (backBtn) backBtn.addEventListener("click", handleBack);
+
+      const saveDraftBtn = document.getElementById("saveDraftBtn");
+      if (saveDraftBtn) saveDraftBtn.addEventListener("click", () => saveCurrent("draft"));
+
+      const saveCompletedBtn = document.getElementById("saveCompletedBtn");
+      if (saveCompletedBtn) saveCompletedBtn.addEventListener("click", () => saveCurrent("completed"));
+
+      const exportBtn = document.getElementById("exportBtn");
+      if (exportBtn) exportBtn.addEventListener("click", exportJson);
+
+      const newBtn = document.getElementById("newBtn");
+      if (newBtn) newBtn.addEventListener("click", newIntake);
+
+      document.querySelectorAll("[data-copy-target]").forEach((button) => {
+        button.addEventListener("click", () => copyText(button.dataset.copyTarget, button));
+      });
+    }
+
+    function toggleMeetingMode() {
+      const enabled = !document.body.classList.contains("meeting-mode");
+      document.body.classList.toggle("meeting-mode", enabled);
+      const button = document.getElementById("meetingModeBtn");
+      if (button) {
+        button.classList.toggle("active", enabled);
+        button.setAttribute("aria-pressed", String(enabled));
+      }
+    }
+
+    function loadDemo() {
+      const hasData = state.company.name || state.company.contactName || state.selectedAreas.length || state.impact.currentPain || state.decisionMap.economicBuyer;
+      if (hasData && !window.confirm("Načíst demo scénář? Neuložená data v aktuálním intake se přepíšou.")) return;
+      state = demoState();
+      outputMode = "internal";
+      render();
+      setNotice("Demo ProvozPlus Servis s.r.o. načtené. Zobrazuji krok 5.");
+    }
+
+    function readStep1() {
+      const meetingModeSelect = document.getElementById("meetingModeSelect");
+      if (meetingModeSelect) state.meetingContext.mode = meetingModeSelect.value || "onsite";
+      const customerSegment = document.getElementById("customerSegment");
+      if (customerSegment) state.meetingContext.customerSegment = customerSegment.value.trim() || "SMB služby/provoz";
+      const initiatedBy = document.getElementById("initiatedBy");
+      if (initiatedBy) state.meetingContext.initiatedBy = initiatedBy.value.trim();
+      const attendees = document.getElementById("attendees");
+      if (attendees) state.meetingContext.attendees = attendees.value.trim();
+      const meetingGoal = document.getElementById("meetingGoal");
+      if (meetingGoal) state.meetingContext.meetingGoal = meetingGoal.value.trim();
+      const companyName = document.getElementById("companyName");
+      if (companyName) state.company.name = companyName.value.trim();
+      const contactName = document.getElementById("contactName");
+      if (contactName) state.company.contactName = contactName.value.trim();
+      const contactRole = document.getElementById("contactRole");
+      if (contactRole) state.company.contactRole = contactRole.value.trim();
+      const leadSourceScore = document.getElementById("leadSourceScore");
+      if (leadSourceScore) {
+        const selectedOption = leadSourceScore.selectedOptions?.[0];
+        const parsedScore = Number.parseInt(selectedOption?.dataset.value || "10", 10);
+        state.leadSourceScore = clampNumber(parsedScore, 0, 20);
+        state.source = selectedOption?.textContent.trim() || state.source;
+      }
+      const targetDate = document.getElementById("targetDate");
+      if (targetDate) state.bant.targetDate = targetDate.value || "";
+      const checkedBudget = document.querySelector('input[name="budget"]:checked');
+      if (checkedBudget) state.bant.budget = checkedBudget.value;
+      const economicBuyer = document.getElementById("economicBuyer");
+      if (economicBuyer) state.decisionMap.economicBuyer = economicBuyer.value.trim();
+      const technicalBuyer = document.getElementById("technicalBuyer");
+      if (technicalBuyer) state.decisionMap.technicalBuyer = technicalBuyer.value.trim();
+      const businessUser = document.getElementById("businessUser");
+      if (businessUser) state.decisionMap.user = businessUser.value.trim();
+      const champion = document.getElementById("champion");
+      if (champion) state.decisionMap.champion = champion.value.trim();
+      const blocker = document.getElementById("blocker");
+      if (blocker) state.decisionMap.blocker = blocker.value.trim();
+    }
+
+    function validateStep1() {
+      readStep1();
+      if (!state.company.name) return "Vyplň název firmy.";
+      if (!state.company.contactName) return "Vyplň jméno kontaktu.";
+      if (!state.company.contactRole) return "Vyplň roli kontaktu.";
+      if (!state.bant.budget) return "Vyber rozpočtové pásmo.";
+      if (!state.bant.targetDate) return "Vyber target go-live datum.";
+      if (state.bant.decisionMakerAccess === null) return "Vyber, jestli jednáš přímo s rozhodovatelem.";
+      return "";
+    }
+
+    function readStep2() {
+      state.impact.peopleCount = document.getElementById("peopleCount")?.value || "";
+      state.impact.hoursPerWeek = document.getElementById("hoursPerWeek")?.value || "";
+      state.impact.hourlyRate = document.getElementById("hourlyRate")?.value || "";
+      state.impact.monthlyExceptions = document.getElementById("monthlyExceptions")?.value || "";
+      state.impact.exceptionCost = document.getElementById("exceptionCost")?.value || "";
+      state.impact.currentPain = document.getElementById("currentPain")?.value.trim() || "";
+      state.impact.unverified = Boolean(document.getElementById("impactUnverified")?.checked);
+    }
+
+    function validateStep2() {
+      readStep2();
+      if (!state.impact.peopleCount) return "Vyplň počet lidí v procesu.";
+      if (!state.impact.hoursPerWeek) return "Vyplň počet hodin týdně.";
+      if (!state.impact.hourlyRate) return "Vyplň odhad hodinové sazby.";
+      if (!state.impact.currentPain) return "Popiš, jak se problém projevuje v provozu.";
+      return "";
+    }
+
+    function readStep3() {
+      const checkedAreas = Array.from(document.querySelectorAll('input[name="area"]:checked')).map((input) => input.value);
+      state.selectedAreas = uniqueValues([...checkedAreas, ...impliedAreaIdsFromSignals()]);
+      state.diagnosticIndex = Math.min(state.diagnosticIndex, Math.max(0, state.selectedAreas.length - 1));
+    }
+
+    function validateStep3() {
+      readStep3();
+      if (!state.selectedAreas.length) return "Vyber alespoň jednu oblast.";
+      return "";
+    }
+
+    function readStep4() {
+      const areaId = state.selectedAreas[state.diagnosticIndex];
+      const area = areaById(areaId);
+      if (!area) return;
+      const answers = {};
+      area.questions.forEach((question) => {
+        answers[question.key] = document.querySelector(`[data-question-key="${question.key}"]`)?.value.trim() || "";
+      });
+      state.diagnostics[areaId] = { answers };
+    }
+
+    function validateStep4() {
+      readStep4();
+      const areaId = state.selectedAreas[state.diagnosticIndex];
+      const area = areaById(areaId);
+      if (!area) return "Vyber alespoň jednu oblast.";
+      const missing = area.questions.find((question) => !state.diagnostics[areaId].answers[question.key]);
+      if (missing) return `Vyplň otázku: ${missing.label}.`;
+      return "";
+    }
+
+    function handleContinue() {
+      if (state.step === 1) {
+        const error = validateStep1();
+        if (error) return setError(error);
+        state.step = 2;
+        render();
+        return;
+      }
+
+      if (state.step === 2) {
+        const error = validateStep2();
+        if (error) return setError(error);
+        state.step = 3;
+        render();
+        return;
+      }
+
+      if (state.step === 3) {
+        const error = validateStep3();
+        if (error) return setError(error);
+        state.diagnosticIndex = 0;
+        state.step = 4;
+        render();
+        return;
+      }
+
+      if (state.step === 4) {
+        const error = validateStep4();
+        if (error) return setError(error);
+        if (state.diagnosticIndex + 1 < state.selectedAreas.length) {
+          state.diagnosticIndex += 1;
+        } else {
+          state.step = 5;
+          state.currentStatus = "handoff_ready";
+        }
+        render();
+      }
+    }
+
+    function handleBack() {
+      setError("");
+      if (state.step === 4 && state.diagnosticIndex > 0) {
+        readStep4();
+        state.diagnosticIndex -= 1;
+        render();
+        return;
+      }
+      if (state.step > 1) {
+        if (state.step === 1) readStep1();
+        if (state.step === 2) readStep2();
+        if (state.step === 3) readStep3();
+        if (state.step === 4) {
+          readStep4();
+          if (state.diagnosticIndex > 0) {
+            state.diagnosticIndex -= 1;
+            render();
+            return;
+          }
+        }
+        state.step -= 1;
+        render();
+      }
+    }
+
+    async function saveCurrent(status) {
+      if (state.step === 1) readStep1();
+      if (state.step === 2) readStep2();
+      if (state.step === 3) readStep3();
+      if (state.step === 4 && state.selectedAreas.length) readStep4();
+      state.currentStatus = status;
+      const record = buildRecord(status);
+      await storageProvider.upsert(record);
+      await refreshRecords();
+      setNotice(status === "completed" ? "Intake uložený jako dokončený." : "Intake uložený.");
+    }
+
+    async function autoSaveCurrent() {
+      if (state.step === 1) readStep1();
+      if (state.step === 2) readStep2();
+      if (state.step === 3) readStep3();
+      if (state.step === 4 && state.selectedAreas.length) readStep4();
+      const status = state.currentStatus || "draft";
+      state.currentStatus = status;
+      const record = buildRecord(status);
+      await storageProvider.upsert(record);
+      await refreshRecords();
+    }
+
+    async function refreshRecords() {
+      recordsCache = await storageProvider.list();
+      renderSavedList();
+    }
+
+    async function loadRecord(id) {
+      const record = await storageProvider.get(id);
+      if (!record) return;
+      const fallbackStep = record.status === "completed" || record.status === "handoff_ready" ? 5 : 1;
+      let loadedStep = record.ui?.step || fallbackStep;
+      if ((record.status === "completed" || record.status === "handoff_ready") && loadedStep === 4 && record.outputs) loadedStep = 5;
+      loadedStep = Math.min(stepNames.length, Math.max(1, loadedStep));
+      const fresh = defaultState();
+      state = {
+        ...fresh,
+        step: loadedStep,
+        diagnosticIndex: record.ui?.diagnosticIndex || 0,
+        currentId: record.id,
+        currentStatus: record.status || "draft",
+        owner: record.owner || "",
+        source: record.source || "",
+        strategicExceptionReason: record.strategicExceptionReason || "",
+        meetingContext: cleanMeetingContext(record.meetingContext || fresh.meetingContext),
+        company: cleanCompany(record.company || fresh.company),
+        decisionMap: { ...fresh.decisionMap, ...(record.decisionMap || {}) },
+        bant: { ...fresh.bant, ...(record.bant || {}) },
+        impact: { ...fresh.impact, ...(record.impact || {}) },
+        leadSourceScore: record.leadSourceScore ?? 10,
+        selectedAreas: record.selectedAreas || [],
+        selectedSignals: record.selectedSignals || [],
+        diagnostics: record.diagnostics || {}
+      };
+      step1Sub = "a";
+      outputMode = "internal";
+      render();
+    }
+
+    function exportJson() {
+      const record = buildRecord(state.currentStatus);
+      const blob = new Blob([JSON.stringify(record, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${record.company.name || "intake"}-${record.id}.json`.replaceAll(" ", "-");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    async function copyText(id, button) {
+      const field = document.getElementById(id);
+      if (!field) return;
+      const original = button.textContent;
+      try {
+        await navigator.clipboard.writeText(field.value);
+        button.textContent = "Zkopírováno";
+      } catch (error) {
+        field.select();
+        document.execCommand("copy");
+        button.textContent = "Zkopírováno";
+      }
+      window.setTimeout(() => {
+        button.textContent = original;
+      }, 1400);
+    }
+
+    function newIntake() {
+      const hasData = state.company.name || state.company.contactName || state.selectedAreas.length || state.impact.currentPain || state.decisionMap.economicBuyer;
+      if (hasData && !window.confirm("Opravdu začít nový intake? Neuložená data se ztratí.")) return;
+      state = defaultState();
+      step1Sub = "a";
+      outputMode = "internal";
+      render();
+    }
+
+    // === PRŮVODCE OVERLAY START ===
+    let guideStep1Mode = "cold";
+    let guideLastFocusedElement = null;
+
+    const guideStepLabels = {
+      1: "BANT",
+      2: "Impact",
+      3: "Oblasti",
+      4: "Diagnostika",
+      5: "Uzavření"
+    };
+
+    const guideAreaTips = {
+      web: {
+        title: "Web / Frontend",
+        script: "Potřebuju oddělit, jestli řešíme nový obchodní kanál, nebo jen technický facelift. Jaký výsledek bude za tři měsíce vidět v číslech?",
+        bullets: [
+          "Vyjasni vlastnictví obsahu, měření konverzí a napojení formulářů.",
+          "Ptej se na současnou URL, CMS, analytiku a schvalování textů."
+        ],
+        redFlags: ["Chybí owner obsahu.", "Cíl je jen obecné 'modernější'.", "Nikdo neměří konverze."]
+      },
+      ux: {
+        title: "UX/UI / Design",
+        script: "Nejdřív zjistím, jestli řešíme estetiku, použitelnost, nebo snížení chyb v procesu. Kdo dnes nejvíc naráží na problém?",
+        bullets: [
+          "Hledej konkrétní uživatelský segment a typ rozhodnutí, které design ovlivní.",
+          "Doptávej se na brand podklady, výzkum, prototypy a schvalovatele."
+        ],
+        redFlags: ["Není jasný koncový uživatel.", "Design má obejít nevyjasněný proces.", "Chybí rozhodovatel pro brand."]
+      },
+      backend: {
+        title: "Backend / Databáze",
+        script: "Potřebuju rozumět datům, rolím a provozním požadavkům. Která data jsou kritická a co se stane, když nejsou dostupná?",
+        bullets: [
+          "Ověř datový model, objem dat, audit log, role a retenci.",
+          "Ptej se na SLA, reporting a napojení na další systémy."
+        ],
+        redFlags: ["Neexistuje vlastník dat.", "Není jasné, kdo smí co vidět.", "SLA se bere jako samozřejmost bez čísla."]
+      },
+      internal: {
+        title: "Interní systém",
+        script: "Popišme si jeden konkrétní průchod procesu od vstupu po výstup. Kde dnes vzniká čekání, ruční přepis nebo obcházení pravidel?",
+        bullets: [
+          "Zachyť počet interních uživatelů, role, schvalovací kroky a výjimky.",
+          "Ověř, který systém nebo tabulku nové řešení nahrazuje."
+        ],
+        redFlags: ["Každý tým popisuje proces jinak.", "Není jasný IT kontakt.", "Klient chce kopírovat starý chaos do nové aplikace."]
+      },
+      automation: {
+        title: "Automatizace procesů",
+        script: "Pojďme najít opakovatelnou část procesu. Který krok se děje často, podle pravidel a dnes bere lidem čas?",
+        bullets: [
+          "Požaduj objem, četnost, výjimky a ruční kontroly.",
+          "Odděl automatizovatelná pravidla od rozhodnutí, která musí zůstat na člověku."
+        ],
+        redFlags: ["Proces nemá stabilní pravidla.", "Výjimky tvoří většinu práce.", "Nikdo neumí říct aktuální objem."]
+      },
+      integration: {
+        title: "API / Účetní integrace",
+        script: "Největší riziko integrace bývá dostupnost API a odpovědnost dodavatele. Máme dokumentaci, sandbox a technický kontakt?",
+        bullets: [
+          "Získej názvy systémů, směr toku dat, frekvenci synchronizace a formát chyb.",
+          "Požaduj API dokumentaci, sandbox nebo alespoň kontakt na dodavatele systému."
+        ],
+        redFlags: ["Dodavatel API nekomunikuje.", "Chybí sandbox.", "Klient neví, který systém je zdroj pravdy."]
+      },
+      mobile: {
+        title: "Mobilní aplikace",
+        script: "Mobil dává smysl, když řeší konkrétní situaci v terénu nebo u zákazníka. Co musí uživatel zvládnout na telefonu a proč nestačí web?",
+        bullets: [
+          "Ověř platformy, offline režim, push notifikace, přihlášení a backend API.",
+          "Doptávej se na typ zařízení, prostředí použití a publikační účty."
+        ],
+        redFlags: ["Není jasné, proč nestačí responzivní web.", "Offline režim se zmíní pozdě.", "Chybí plán na podporu verzí."]
+      },
+      ai: {
+        title: "AI / Data",
+        script: "AI začíná kvalitou dat a metrikou úspěchu. Jaká historická data máme a podle čeho poznáme, že výstup pomáhá?",
+        bullets: [
+          "Ověř dostupnost, strukturu, objem a právní použitelnost dat.",
+          "Ptej se na human-in-the-loop kontrolu a hranici přijatelné chyby."
+        ],
+        redFlags: ["Klient chce AI bez dat.", "Není metrika úspěchu.", "Výstup má rozhodovat bez lidské kontroly."]
+      },
+      devops: {
+        title: "Cloud / DevOps",
+        script: "Provozní část potřebuje čísla. Jaká dostupnost je nutná, kdo řeší incidenty a jak rychle se musí systém obnovit?",
+        bullets: [
+          "Doptávej se na hosting, CI/CD, monitoring, zálohy, RTO/RPO a release proces.",
+          "Zjisti, kdo má přístupy a kdo ponese provozní odpovědnost po předání."
+        ],
+        redFlags: ["Neexistují přístupy.", "Nikdo nezná RTO/RPO.", "Monitoring je jen ruční kontrola, když si někdo všimne."]
+      },
+      security: {
+        title: "Bezpečnost / Compliance",
+        script: "Potřebuju vědět, jak citlivá data tečou systémem a jaké regulace klient řeší. Která data jsou osobní, finanční nebo zdravotní?",
+        bullets: [
+          "Zmapuj typ dat, právní požadavky, role, audit log, DPA a retenci.",
+          "U citlivých dat navrhni bezpečnostní review před naceněním implementace."
+        ],
+        redFlags: ["Klient podceňuje osobní data.", "Chybí právní vlastník.", "Požadavky na audit se objeví až po nabídce."]
+      },
+      maintenance: {
+        title: "Údržba a dlouhodobá podpora",
+        script: "Převzetí systému je hlavně o riziku. Máme repozitář, dokumentaci, přístupy a historii incidentů?",
+        bullets: [
+          "Získej informace o stacku, backlogu, SLA, monitoringu a posledních incidentech.",
+          "Odděl převzetí, stabilizaci a nový rozvoj do samostatných fází."
+        ],
+        redFlags: ["Chybí repozitář nebo přístupy.", "Systém je bez dokumentace.", "Klient chce SLA bez stabilizační fáze."]
+      }
+    };
+
+    function guideEscape(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function guideList(items) {
+      return `<ul>${items.map((item) => `<li>${guideEscape(item)}</li>`).join("")}</ul>`;
+    }
+
+    function guideRedFlags(items) {
+      return `<div class="guide-red-flags">${items.map((item) => `<div class="guide-red-flag">${guideEscape(item)}</div>`).join("")}</div>`;
+    }
+
+    function guideSection(title, body) {
+      return `<div class="guide-section"><h4>${guideEscape(title)}</h4>${body}</div>`;
+    }
+
+    function updateGuideButtonLabel() {
+      const button = document.getElementById("guideOpenBtn");
+      if (!button) return;
+      button.textContent = `Průvodce · ${guideStepLabels[state.step] || "Schůzka"}`;
+    }
+
+    function guideStep1Content() {
+      const isCold = guideStep1Mode === "cold";
+      const script = isCold
+        ? "Abychom si rychle řekli, jestli má smysl jít do nabídky, projdu rozpočet, termín a rozhodovací proces. Když něco chybí, navrhnu jen další kvalifikační krok."
+        : "Navážu na to, co už víme, a doplním jen mezery: kdo drží rozpočet, kdo schvaluje techniku a co je pevný termín.";
+      const bullets = isCold
+        ? ["Ptej se nejdřív na důvod změny, potom na rozpočet a termín.", "U rozhodovatele rozlišuj přímý přístup, champion kontakt a skutečný ekonomický buyer."]
+        : ["Ověř, jestli se nezměnil buyer, budget nebo go-live.", "Doplň champion a blocker, ať PM ví, kde může obchod uváznout."];
+      return `
+        ${guideSection("Režim hovoru", `
+          <div class="guide-pills" role="tablist" aria-label="Typ leadu">
+            <button class="guide-pill ${isCold ? "active" : ""}" data-guide-mode="cold" type="button" role="tab" aria-selected="${isCold}">Cold</button>
+            <button class="guide-pill ${!isCold ? "active" : ""}" data-guide-mode="warm" type="button" role="tab" aria-selected="${!isCold}">Warm</button>
+          </div>
+        `)}
+        ${guideSection("Skript", `<p class="guide-script">${guideEscape(script)}</p>`)}
+        ${guideSection("Co hlídat", guideList(bullets))}
+        ${guideSection("Red flags", guideRedFlags([
+          "Rozpočet je neurčitý nebo výrazně pod cílovým rozsahem.",
+          "Termín je urgentní, ale bez rozhodovatele na schůzce.",
+          "Kontakt neumí říct, kdo projekt schvaluje nebo blokuje."
+        ]))}
+      `;
+    }
+
+    function guideStep2Content() {
+      return `
+        ${guideSection("Skript", `<p class="guide-script">Převedu problém na peníze, aby bylo jasné, jestli projekt unese discovery a implementaci. Kolik lidí se toho týká, kolik času ztrácí a kolik stojí výjimky?</p>`)}
+        ${guideSection("Impact kalkulačka", guideList([
+          "Nech klienta odhadnout interval, když nezná přesné číslo.",
+          "U hodinové sazby používej náklad firmy, ne fakturační sazbu dodavatele.",
+          "U výjimek se ptej na reálný dopad: refundace, zdržení, reputace, ruční opravy."
+        ]))}
+        ${guideSection("Red flags", guideRedFlags([
+          "Bolest je popsaná pocitově, ale nikdo nechce dodat objem.",
+          "Problém nemá vlastníka v provozu.",
+          "Roční dopad vychází nízko proti očekávanému budgetu."
+        ]))}
+      `;
+    }
+
+    function guideStep3Content() {
+      const rows = [
+        ["Ruční přepis", "Automatizace / Interní systém"],
+        ["Více systémů", "API / Integrace"],
+        ["Nekvalitní data", "AI / Data"],
+        ["Citlivá data", "Security / Compliance"],
+        ["Výpadky", "DevOps / Maintenance"],
+        ["Terénní práce", "Mobilní aplikace"],
+        ["Nízké konverze", "Web / UX"]
+      ];
+      return `
+        ${guideSection("Skript", `<p class="guide-script">Projdu krátký ano/ne strom. Pokud klient řekne ano, oblast zapnu a později ji diagnostikuju. Pokud signál nezazněl, tým tím nebudu zatěžovat.</p>`)}
+        ${guideSection("Signal → oblast", `
+          <div class="guide-table">
+            ${rows.map(([signal, area]) => `
+              <div class="guide-table-row"><strong>${guideEscape(signal)}</strong><span>${guideEscape(area)}</span></div>
+            `).join("")}
+          </div>
+        `)}
+        ${guideSection("Pravidlo výběru", guideList([
+          "Ano znamená: klient popsal konkrétní signál, systém, proces nebo výstup.",
+          "Ne znamená: role nezapojujeme jen pro jistotu.",
+          "Když vyjde více oblastí, uzavři to jako placenou diagnostiku nebo fázi 0."
+        ]))}
+      `;
+    }
+
+    function activeGuideAreaTip() {
+      const areaId = state.selectedAreas[state.diagnosticIndex] || state.selectedAreas[0] || "";
+      const area = areaById(areaId);
+      return {
+        id: areaId,
+        title: area?.title || "Vybraná oblast",
+        tip: guideAreaTips[areaId] || {
+          title: area?.title || "Oblast bez detailního tipu",
+          script: "Drž se konkrétního problému, rozsahu, odpovědnosti klienta a dalšího ověřitelného kroku.",
+          bullets: ["Získej vstupy, rozhodovatele, rizika a jasný výstup diagnostiky."],
+          redFlags: ["Nejasný vlastník.", "Neověřený rozsah.", "Chybějící technický kontakt."]
+        }
+      };
+    }
+
+    function guideStep4Content() {
+      if (!state.selectedAreas.length) {
+        return `
+          ${guideSection("Nejdřív vyber oblast", `<p>Diagnostický tip se zobrazí po výběru alespoň jedné oblasti služeb.</p>`)}
+        `;
+      }
+      const active = activeGuideAreaTip();
+      const index = Math.min(state.diagnosticIndex + 1, state.selectedAreas.length);
+      return `
+        ${guideSection(`Aktivní oblast ${index}/${state.selectedAreas.length}`, `<p><strong>${guideEscape(active.tip.title || active.title)}</strong></p>`)}
+        ${guideSection("Skript", `<p class="guide-script">${guideEscape(active.tip.script)}</p>`)}
+        ${guideSection("Diagnostické tipy", guideList(active.tip.bullets))}
+        ${guideSection("Red flags", guideRedFlags(active.tip.redFlags))}
+      `;
+    }
+
+    function guideClosingScript(scoreTotal) {
+      if (scoreTotal >= 70) {
+        return "Tohle má dobrý fit. Navrhnu konkrétní další krok: discovery nebo fázi 0, kde ověříme rizika a připravíme scope pro nabídku.";
+      }
+      if (scoreTotal >= 40) {
+        return "Vidím potenciál, ale před nabídkou musíme doplnit mezery. Pošlu krátký seznam vstupů a podle odpovědí rozhodneme, jestli jít do discovery.";
+      }
+      return "Teď bych to nedával do nabídky. Doporučím kvalifikační follow-up nebo nurturing, dokud nebude jasný rozpočet, rozhodovatel a dopad.";
+    }
+
+    function guideStep5Content() {
+      const score = calculateScore();
+      const total = Number(score.total) || 0;
+      return `
+        ${guideSection("Doporučený závěr", `<p><strong>Score: ${guideEscape(total)}/100</strong></p><p class="guide-script">${guideEscape(guideClosingScript(total))}</p>`)}
+        ${guideSection("Před ukončením hovoru", `
+          <div class="guide-checklist">
+            <label><input type="checkbox"> Je jasný ekonomický buyer a další rozhodovací krok.</label>
+            <label><input type="checkbox"> Klient ví, co má dodat před discovery nebo fází 0.</label>
+            <label><input type="checkbox"> Rizika jsou pojmenovaná nahlas, ne schovaná v poznámkách.</label>
+            <label><input type="checkbox"> Handoff obsahuje PM/analyst vstupy a neobsahuje domněnky.</label>
+          </div>
+        `)}
+        ${guideSection("Red flags", guideRedFlags([
+          "Klient tlačí na cenu bez potvrzeného rozsahu.",
+          "Není domluvený další krok s termínem a vlastníkem.",
+          "Výstup vypadá dobře, ale chybí technické vstupy pro tým."
+        ]))}
+      `;
+    }
+
+    function guideContentForStep() {
+      if (state.step === 1) return guideStep1Content();
+      if (state.step === 2) return guideStep2Content();
+      if (state.step === 3) return guideStep3Content();
+      if (state.step === 4) return guideStep4Content();
+      if (state.step === 5) return guideStep5Content();
+      return guideSection("Průvodce", "<p>Vyber krok intake procesu.</p>");
+    }
+
+    function renderGuideOverlay() {
+      const title = document.getElementById("guideTitle");
+      const body = document.getElementById("guideBody");
+      if (!title || !body) return;
+      title.textContent = `Průvodce · ${guideStepLabels[state.step] || "Schůzka"}`;
+      body.innerHTML = guideContentForStep();
+      body.querySelectorAll("[data-guide-mode]").forEach((button) => {
+        button.addEventListener("click", () => {
+          guideStep1Mode = button.dataset.guideMode === "warm" ? "warm" : "cold";
+          renderGuideOverlay();
+        });
+      });
+    }
+
+    function openGuideOverlay() {
+      const overlay = document.getElementById("guideOverlay");
+      const closeButton = document.getElementById("guideCloseBtn");
+      if (!overlay) return;
+      guideLastFocusedElement = document.activeElement;
+      updateGuideButtonLabel();
+      renderGuideOverlay();
+      overlay.classList.add("visible");
+      overlay.setAttribute("aria-hidden", "false");
+      window.requestAnimationFrame(() => overlay.classList.add("open"));
+      if (closeButton) closeButton.focus();
+    }
+
+    function closeGuideOverlay() {
+      const overlay = document.getElementById("guideOverlay");
+      if (!overlay || !overlay.classList.contains("visible")) return;
+      overlay.classList.remove("open");
+      overlay.setAttribute("aria-hidden", "true");
+      window.setTimeout(() => overlay.classList.remove("visible"), 180);
+      if (guideLastFocusedElement && typeof guideLastFocusedElement.focus === "function") {
+        guideLastFocusedElement.focus();
+      }
+    }
+
+    function bindGuideOverlay() {
+      const openButton = document.getElementById("guideOpenBtn");
+      const closeButton = document.getElementById("guideCloseBtn");
+      const overlay = document.getElementById("guideOverlay");
+      if (openButton) openButton.addEventListener("click", openGuideOverlay);
+      if (closeButton) closeButton.addEventListener("click", closeGuideOverlay);
+      if (overlay) {
+        overlay.addEventListener("click", (event) => {
+          if (event.target === overlay) closeGuideOverlay();
+        });
+      }
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") closeGuideOverlay();
+      });
+      document.addEventListener("click", () => window.setTimeout(updateGuideButtonLabel, 0));
+      document.addEventListener("change", () => window.setTimeout(updateGuideButtonLabel, 0));
+      const stepName = document.getElementById("stepName");
+      const stepRoot = document.getElementById("stepRoot");
+      const observer = new MutationObserver(updateGuideButtonLabel);
+      if (stepName) observer.observe(stepName, { childList: true, characterData: true, subtree: true });
+      if (stepRoot) observer.observe(stepRoot, { childList: true });
+      updateGuideButtonLabel();
+    }
+
+    bindGuideOverlay();
+    // === PRŮVODCE OVERLAY END ===
+
+    async function init() {
+      await refreshRecords();
+      render();
+      setInterval(() => {
+        const visibleCompanyName = document.getElementById("companyName")?.value.trim();
+        if (state.company.name || visibleCompanyName) autoSaveCurrent().catch(() => {});
+      }, 30000);
+    }
+
+    init();
+  </script>
+</body>
+</html>
