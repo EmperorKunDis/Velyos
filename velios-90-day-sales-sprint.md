@@ -80,6 +80,7 @@ Týdenní minimum:
 - Oslovit minimálně 30 firem týdně.
 - Každý kontakt poslat s jednou konkrétní hypotézou provozního problému.
 - Každou odpověď vyhodnotit podle toho, jestli potvrzuje problém, buyera nebo timing.
+- Pokud outbound otevře třídění, čištění, mapování nebo analýzu klientských dat, použít v intake větev Vstupní data a procesní analýza.
 - Po každé schůzce vyplnit intake konfigurátor a uložit další krok.
 
 ### Dny 31-60: zúžení a prodej Fáze 0
@@ -186,8 +187,11 @@ Pro firmu, která ví, že ji brzdí ruční práce, přepisování dat, chyby, 
 - mapa procesu,
 - odhad úspory času nebo snížení chyb,
 - technická rizika a missing inputs,
+- datový checklist, cíle a anti-goals, pokud pracujeme s klientskými daty,
 - doporučení: nabídka / pilot / doplnit vstupy / stop,
 - návrh první implementační fáze, pokud dává ekonomický smysl.
+
+Interní fakturační checklist Fáze 0: kickoff placené Fáze 0 spustit až po písemném schválení nebo objednávce a po vystavení faktury. Nezaplacená faktura zůstává obchodní riziko, které musí být vidět v handoffu.
 
 ### Co potřebujeme od klienta
 
@@ -225,7 +229,8 @@ Rozhodovací otázky:
 2. Která formulace vyvolala konkrétní problém?
 3. Kde se objevuje decision maker?
 4. Proč klienti odmítají Fázi 0?
-5. Co příští týden změnit: segment, hypotézu, text nebo follow-up?
+5. Jsou prodané Fáze 0 před kickoffem kryté objednávkou nebo schválením a vystavenou fakturou?
+6. Co příští týden změnit: segment, hypotézu, text nebo follow-up?
 
 ---
 

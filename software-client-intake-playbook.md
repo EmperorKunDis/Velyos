@@ -123,6 +123,7 @@ Interní pravidla fitu:
 | Strategická výjimka pod 100k Kč | Musí být zapsaný důvod: reference, partnerství, vstup do segmentu, opakovatelný produkt nebo cesta k větší zakázce. |
 | Jednoduchý web / UX bez integrací | Může jít do rychlé nabídky po krátkém potvrzení scope, pokud nejsou citlivá data, backend ani technická rizika. |
 | Automatizace, integrace, AI/data, interní systém, security, DevOps nebo maintenance | Výchozí další krok je placená diagnostika / Fáze 0. |
+| Třídění, čištění, mapování nebo analýza klientských dat | Není součást bezplatné kvalifikace. Překlopit do placené Fáze 0, pokud nejde jen o krátkou kontrolu vzorku. |
 | Nejasný proces, API, data, technický kontakt nebo buyer | Neprodávat závaznou nabídku. Doplnit vstupy nebo prodat Fázi 0. |
 | Převzetí starého systému | Vždy technická diagnostika před cenou, včetně přístupů, repozitářů, dokumentace, incidentů a provozu. |
 
@@ -137,6 +138,7 @@ Obchod smí slíbit nabídku jen tehdy, když platí:
 Obchod musí prodat diagnostiku, pokud platí alespoň jedno:
 
 - klient chce automatizaci, integraci, AI agenta, interní systém, security, DevOps, údržbu nebo převzetí systému,
+- klient chce, aby Velios třídil, čistil, mapoval nebo analyzoval jeho data,
 - chybí data, API dokumentace, sandbox, přístupy, vlastník dat nebo technický kontakt,
 - klient chce závaznou cenu bez ověřeného rozsahu,
 - do řešení vstupuje více stakeholderů a není jasný ekonomický buyer,
@@ -172,12 +174,38 @@ Balíček nepoužít, pokud jde o malý jasný web bez integrací, bez citlivýc
 Placená diagnostika / fáze 0 je výchozí další krok, pokud platí alespoň jedno:
 
 - řešení obsahuje integrace, AI/data, interní systém, compliance, provozní SLA nebo převzetí existujícího systému,
+- řešení vyžaduje třídění, čištění, mapování nebo analýzu dat klienta,
 - chybí API dokumentace, vlastník dat, technický kontakt nebo jasný proces,
 - zákazník chce závaznou cenu, ale rozsah není ověřený,
 - dopad je pravděpodobně vysoký, ale není číselně potvrzený,
 - účastní se více stakeholderů a není jasný ekonomický buyer.
 
 Rychlá nabídka je povolená jen pro malý a jasný scope, typicky jednoduchý web nebo menší úprava bez integrací, bez citlivých dat a s jasným rozhodovatelem.
+
+### 2.10.1 Bezplatná vs. placená vstupní analýza
+
+Bezplatná vstupní analýza je jen basic kvalifikace. Obchod zdarma ověří problém, cíl, fit, rozhodovací kontext a orientační další krok. Zdarma se nedělá skutečné třídění, čištění, mapování ani analýza klientských dat.
+
+Do placené Fáze 0 se intake překlápí, pokud platí alespoň jedno:
+
+- klient potřebuje, aby Velios pracoval s jeho daty déle než krátká kontrola vzorku,
+- je potřeba data třídit, čistit, sjednocovat, mapovat na proces nebo vyhodnocovat kvalitu,
+- není jasné, kdo data vlastní, proč se používají nebo jaký výstup má analýza přinést,
+- klient chce závěr, doporučení nebo odhad ceny odvozený z reálných dat.
+
+Výstupem placené datové diagnostiky je datový checklist, cíle, anti-goals, chybějící vstupy, zapojené role a rozhodnutí nabídka / doplnit vstupy / stop.
+
+### 2.10.2 Interní fakturační checklist Fáze 0
+
+Fáze 0 může začít po písemném schválení nebo objednávce a po vystavení faktury. Nezaplacená faktura je sledované obchodní riziko, které musí být vidět v handoffu.
+
+Před kickoffem placené Fáze 0 musí být jasné:
+
+- fakturační údaje klienta včetně IČO, případně DIČ,
+- fakturační kontakt a e-mail pro zaslání faktury,
+- kdo schvaluje objednávku, cenu a smluvní podmínky,
+- cena Fáze 0, splatnost a stav vystavení faktury,
+- zda je platba uhrazená, po splatnosti nebo čeká na interní schválení klienta.
 
 ### 2.11 Interní role pravidla a RACI pro první fázi
 
@@ -297,6 +325,7 @@ Před návštěvou obchodník zjistí:
 | Proces | Pochopit současný stav | Jak to dnes řešíte krok za krokem? |
 | Dopad | Zjistit hodnotu problému | Kolik času, peněz nebo příležitostí vás to stojí? |
 | Rozsah | Oddělit oblasti | Jde o web, interní systém, automatizaci, integraci, data, nebo něco jiného? |
+| Vstupní data | Oddělit basic kvalifikaci od placené datové práce | Jaká data byste dodali, proč s nimi chcete pracovat, co je cílem a co řešení dělat nemá? |
 | Stakeholdeři | Zjistit role | Kdo to bude používat, kdo rozhoduje a kdo schvaluje rozpočet? |
 | Termín | Zjistit naléhavost | Proč právě teď a dokdy to musí být vyřešené? |
 | Rozpočet | Ověřit realitu | Máte na to vyčleněný rozpočet nebo rozpočtové pásmo? |
@@ -309,6 +338,7 @@ Před návštěvou obchodník zjistí:
 | Papíry, Excel, ruční přepisování | Automatizace nebo interní systém | Analytik, backend |
 | Starý nebo nefunkční web | Frontend, UX/UI, SEO, obsah | UX/UI, frontend |
 | Více nepropojených systémů | Integrace, datová architektura | Analytik, backend, DevOps |
+| Klient přináší exporty, tabulky nebo historická data k posouzení | Vstupní data a procesní analýza, obvykle placená Fáze 0 | PM, analytik, AI/data, security podle typu dat |
 | Citlivá data | Bezpečnost, přístupy, compliance | Security/compliance |
 | Časté reklamace nebo chyby | QA, procesní analýza | PM, analytik, QA |
 | Majitel vše řeší sám | Nutnost jednoduchého adminu a školení | PM, UX/UI, analytik |
@@ -598,6 +628,37 @@ Rizikové signály:
 - očekává stoprocentní přesnost,
 - chce automatické rozhodování nad citlivými oblastmi bez kontroly.
 
+### 6.8a Vstupní data a procesní analýza
+
+Tato větev se používá, když klient přináší vlastní data, exporty, tabulky nebo historické záznamy a očekává závěr nad nimi. Není to totéž jako basic kvalifikace. Pokud práce s daty přesáhne krátkou kontrolu vzorku, jde o placenou Fázi 0.
+
+| Otázka | Pokud ano | Pokud ne | Zapojit |
+|---|---|---|---|
+| Víme, jaká data klient dodá? | Vyžádat vzorek a datový checklist | Nejdřív doplnit vstupy | PM, analytik |
+| Je jasné, proč klient data řeší a jaký je cíl? | Definovat měřitelný výstup | Hrozí vágní analýza bez výsledku | Analytik |
+| Je jasné, co řešení dělat nemá? | Zapsat anti-goals a hranice scope | Doplnit očekávání před cenou | PM, analytik |
+| Je známý vlastník dat a práva k použití? | Ověřit přístupy a odpovědnost | Zapojit security podle typu dat | Security/compliance |
+| Je potřeba data třídit, čistit nebo mapovat na proces? | Překlopit do placené Fáze 0 | Zůstat u krátké kvalifikace | Analyst, AI/Data |
+
+Povinná data:
+
+- vzorek dat,
+- vlastník dat,
+- proč klient data řeší,
+- cílový výstup nebo rozhodnutí,
+- anti-goals,
+- rozsah třídění, čištění nebo mapování,
+- chybějící vstupy,
+- typ dat a bezpečnostní omezení.
+
+Výstup:
+
+- datový checklist,
+- cíle a anti-goals,
+- chybějící vstupy,
+- doporučení zdarma / placená Fáze 0 / stop,
+- role a fáze projektu, ve kterých vstupují do práce.
+
 ### 6.9 Cloud / DevOps / infrastruktura
 
 | Otázka | Pokud ano | Pokud ne | Zapojit |
@@ -724,6 +785,7 @@ Tento strom je praktická verze pro obchodníka. Používá se u zákazníka neb
 | Má systém ukládat role, data, workflow nebo pravidla? | Zapnout Backend / Databáze. | Backend nezapojovat u čistého webu. |
 | Má se používat v terénu nebo nativně v mobilu? | Zapnout Mobile, UX/UI, Backend, QA. | Mobile větev vypnout. |
 | Chce klient AI agenta, predikce, reporting nebo práci s daty? | Zapnout AI/Data, ověřit data a human-in-the-loop. | AI tým nezapojovat. |
+| Dodá klient vlastní data, která máme třídit, čistit, mapovat nebo analyzovat? | Zapnout Vstupní data a procesní analýzu; pokud nejde jen o krátký vzorek, doporučit placenou Fázi 0. | Zůstat u basic kvalifikace. |
 | Bude to produkčně běžet, vyžaduje SLA, monitoring nebo cloud? | Zapnout DevOps. | DevOps jen pokud existuje provozní riziko. |
 | Jsou ve hře osobní, zdravotní, finanční, HR nebo regulovaná data? | Zapnout Security/Compliance před nabídkou. | Security jen při dalších rizikových signálech. |
 | Přebíráme existující systém nebo podporu? | Zapnout Maintenance, Tech Lead, DevOps, QA. | Maintenance větev vypnout. |
@@ -762,6 +824,7 @@ Výsledkem stromu není jen seznam oblastí. Výsledkem musí být:
 | Klient chce web nebo portál | PM, UX/UI, frontend, případně backend | DevOps, pokud nejde o provozní nebo cloudové téma |
 | Klient má osobní nebo citlivá data | Security/compliance, backend, PM | Nikdo nesmí připravit nabídku bez posouzení rizik |
 | Klient chce AI nad firemními daty | Analytik, data/AI, security/compliance podle dat | AI tým, pokud není jasný problém ani data |
+| Klient chce analýzu, čištění nebo mapování vlastních dat | PM, analytik, AI/data, security/compliance podle typu dat | Nepokračovat jako bezplatná basic analýza |
 | Klient chce převzít existující systém | PM, tech lead, DevOps, QA podle provozu | Design a frontend, pokud se nemění UI |
 | Klient nemá problém, rozpočet ani rozhodovatele | Obchodník | PM, analytik, vývoj, design, DevOps, QA |
 

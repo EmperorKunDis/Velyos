@@ -1627,7 +1627,7 @@
     const STORAGE_KEY = "velyos.intake.records.v1";
     const MIN_TARGET_BUDGET = "100-300k";
     const MIN_STANDARD_PROJECT_CZK = 100000;
-    const TECHNICAL_DIAGNOSTIC_AREAS = ["automation", "integration", "ai", "internal", "maintenance", "security", "devops"];
+    const TECHNICAL_DIAGNOSTIC_AREAS = ["automation", "integration", "ai", "internal", "maintenance", "security", "devops", "data_intake"];
     const primaryOffer = "Automatizace a digitalizace procesů";
     const diagnosticPackage = {
       name: "Velios Fáze 0: Procesní a technická diagnostika",
@@ -1638,13 +1638,15 @@
         "Odhad úspory času",
         "Rizika a otevřené otázky",
         "Zapojené role",
+        "Datový checklist",
         "Technické vstupy",
         "Scope fáze 1",
         "Doporučení nabídka / stop"
       ],
       useWhen: [
-        "Automatizace, integrace, AI/data, interní systém, DevOps, security nebo maintenance",
+        "Automatizace, integrace, AI/data, vstupní data, interní systém, DevOps, security nebo maintenance",
         "Nejasný proces, data, API, technický kontakt nebo vlastník rozhodnutí",
+        "Třídění, čištění, mapování nebo analýza klientských dat",
         "Klient chce závaznou cenu před ověřením rozsahu"
       ],
       doNotUseWhen: [
@@ -1661,6 +1663,17 @@
       monthlyMeetingTarget: "5-8 intake/discovery schůzek",
       implementationOffer: "Pilot automatizace",
       recurringOffer: "Rozvoj a provoz"
+    };
+    const phaseZeroInvoiceChecklist = {
+      title: "Interní fakturační checklist Fáze 0",
+      rule: "Písemné schválení/objednávka a vystavená faktura před startem; nezaplacená faktura je obchodní riziko v handoffu.",
+      checks: [
+        "Fakturační údaje včetně IČO, případně DIČ",
+        "Fakturační kontakt a e-mail pro zaslání faktury",
+        "Schvalovatel objednávky, ceny a podmínek",
+        "Cena Fáze 0, splatnost a stav vystavení faktury",
+        "Stav platby: uhrazeno / čeká / po splatnosti"
+      ]
     };
 
     const serviceAreas = [
@@ -1795,6 +1808,20 @@
           { key: "downtimeCost", label: "Kolik stojí hodina výpadku" },
           { key: "supportType", label: "Je potřeba rozvoj, údržba, nebo oboje" }
         ]
+      },
+      {
+        id: "data_intake",
+        number: 12,
+        title: "Vstupní data a procesní analýza",
+        description: "Klientská data, cíle, anti-goals, čištění a mapování.",
+        roles: ["PM", "Analyst", "AI/Data", "Security"],
+        questions: [
+          { key: "dataSample", label: "Jaký vzorek dat klient dodá" },
+          { key: "businessGoal", label: "Proč to klient chce a co je cílem" },
+          { key: "antiGoals", label: "Co řešení dělat nemá" },
+          { key: "dataOwner", label: "Kdo data vlastní a schvaluje použití" },
+          { key: "cleanupScope", label: "Kolik třídění, čištění nebo mapování je potřeba" }
+        ]
       }
     ];
 
@@ -1852,9 +1879,16 @@
       {
         id: "ai_data",
         question: "Chce klient AI agenta, predikce, reporting nebo práci s daty?",
-        yes: "Zapnout AI/Data, ověřit data a human-in-the-loop.",
+        yes: "Zapnout AI/Data a Vstupní data, ověřit data a human-in-the-loop.",
         no: "AI tým nezapojovat.",
-        areas: ["ai"]
+        areas: ["ai", "data_intake"]
+      },
+      {
+        id: "client_data_work",
+        question: "Dodá klient vlastní data, která máme třídit, čistit, mapovat nebo analyzovat?",
+        yes: "Zapnout Vstupní data a procesní analýzu; pokud nejde jen o krátký vzorek, doporučit placenou Fázi 0.",
+        no: "Zůstat u basic kvalifikace bez práce nad daty.",
+        areas: ["data_intake"]
       },
       {
         id: "production_ops",
@@ -2242,6 +2276,7 @@
     }
 
     function projectTypeForImpact(annualLoss) {
+      if (state.selectedAreas.includes("data_intake")) return "Placená vstupní analýza dat a procesu";
       if (state.selectedAreas.includes("ai")) return "Datová/AI diagnostika před implementací";
       if (state.selectedAreas.includes("integration")) return "Integrační discovery a automatizace toku dat";
       if (state.selectedAreas.includes("automation") || state.selectedAreas.includes("internal")) return "Automatizace procesu s měřitelnou úsporou času";
@@ -2279,7 +2314,7 @@
       });
 
       if (state.selectedAreas.length > 0) involve.add("PM");
-      if (["internal", "automation", "integration", "ai", "security"].some((id) => state.selectedAreas.includes(id))) involve.add("Analyst");
+      if (["internal", "automation", "integration", "ai", "security", "data_intake"].some((id) => state.selectedAreas.includes(id))) involve.add("Analyst");
       if (["internal", "automation", "integration", "mobile"].some((id) => state.selectedAreas.includes(id))) involve.add("QA");
       if (["devops", "maintenance"].some((id) => state.selectedAreas.includes(id))) involve.add("DevOps");
       if (textContains(text, ["gdpr", "nis2", "hipaa", "osob", "citliv", "zdravot", "finan", "audit", "regul"])) involve.add("Security");
@@ -2317,6 +2352,14 @@
       if (state.selectedAreas.includes("ai") && textContains(text, ["nejsou data", "nemáme data", "nevíme", "nevim"])) {
         risks.push("AI/data téma bez potvrzené dostupnosti a kvality dat.");
       }
+      if (state.selectedAreas.includes("data_intake")) {
+        const answers = state.diagnostics.data_intake?.answers || {};
+        if (!answers.businessGoal || !answers.antiGoals) risks.push("Vstupní datová analýza bez jasného cíle nebo anti-goals.");
+        if (!answers.dataSample || !answers.dataOwner) risks.push("Chybí vzorek dat nebo vlastník dat pro placenou datovou diagnostiku.");
+        if (textContains(answers.cleanupScope || "", ["hodin", "dny", "týd", "tyd", "hodně", "hodne", "moc", "čistit", "cistit", "třídit", "tridit", "mapovat"])) {
+          risks.push("Práce s klientskými daty přesahuje basic kvalifikaci a patří do placené Fáze 0.");
+        }
+      }
       if (state.selectedAreas.includes("maintenance") && textContains(text, ["bez dokumentace", "nemáme přístupy", "nemame pristupy", "neznáme", "nezname"])) {
         risks.push("Převzetí systému s chybějící dokumentací nebo přístupy.");
       }
@@ -2349,14 +2392,18 @@
         byKey.technical.level = textContains(answer, ["ne", "není", "nemáme", "neexist", "chybí"]) ? 3 : 2;
         byKey.technical.action = "Ověřit API dokumentaci, sandbox a odpovědnost dodavatele.";
       }
-      if (state.selectedAreas.includes("ai")) {
+      if (state.selectedAreas.includes("ai") || state.selectedAreas.includes("data_intake")) {
         const readiness = calculateDataReadiness();
         byKey.data.level = readiness.score < 45 ? 3 : readiness.score < 70 ? 2 : 1;
-        byKey.data.action = readiness.score < 70 ? "Doporučit datový audit před AI slibem." : "Potvrdit datovou metriku úspěchu v discovery.";
+        byKey.data.action = readiness.score < 70 ? "Doporučit placenou datovou diagnostiku před závěrem nad daty." : "Potvrdit datový checklist, cíl a anti-goals v discovery.";
       }
       if (state.selectedAreas.includes("security") || textContains(text, ["gdpr", "nis2", "hipaa", "osob", "citliv", "zdravot", "finan", "hr", "mzdy", "děti", "deti"])) {
         byKey.compliance.level = 3;
         byKey.compliance.action = "Zapojit security/compliance ještě před cenovou nabídkou.";
+      }
+      if (state.selectedAreas.includes("data_intake")) {
+        byKey.business.level = Math.max(byKey.business.level, 2);
+        byKey.business.action = "Oddělit bezplatnou basic kvalifikaci od placené práce nad klientskými daty.";
       }
       if (state.selectedAreas.includes("maintenance") || textContains(text, ["sla", "rto", "rpo", "monitoring", "incident", "výpad", "vypad"])) {
         byKey.operations.level = Math.max(byKey.operations.level, 2);
@@ -2367,14 +2414,16 @@
     }
 
     function calculateDataReadiness() {
-      if (!state.selectedAreas.includes("ai") && !state.selectedAreas.includes("integration")) {
+      if (!state.selectedAreas.includes("ai") && !state.selectedAreas.includes("integration") && !state.selectedAreas.includes("data_intake")) {
         return { score: 100, label: "Není relevantní", checks: [], applicable: false };
       }
 
       const text = collectDiagnosticText();
       const checks = [
-        { label: "Data dostupná", ok: textContains(text, ["ano", "máme", "mame", "exist", "historická", "historicka", "export", "api"]) && !textContains(text, ["nejsou data", "nemáme data", "nemame data"]) },
+        { label: "Vzorek/data dostupná", ok: textContains(text, ["ano", "máme", "mame", "exist", "historická", "historicka", "export", "api", "vzorek", "csv", "xlsx"]) && !textContains(text, ["nejsou data", "nemáme data", "nemame data"]) },
         { label: "Vlastník dat", ok: textContains(text, ["owner", "vlastník", "vlastnik", "spravuje", "it", "data tým", "data tym"]) },
+        { label: "Cíl analýzy", ok: textContains(text, ["cíl", "cil", "chceme", "potřebujeme", "potrebujeme", "rozhodnout", "zjistit", "výstup", "vystup"]) },
+        { label: "Anti-goals", ok: textContains(text, ["nemá", "nema", "nechceme", "nebude", "anti", "mimo scope", "nedělat", "nedelat"]) },
         { label: "Kvalita popsaná", ok: textContains(text, ["kvalit", "valid", "čist", "cist", "kontrol", "audit"]) },
         { label: "Právní titul", ok: textContains(text, ["gdpr", "souhlas", "smlouva", "oprávně", "opravne", "dpa", "audit"]) },
         { label: "API/export", ok: textContains(text, ["api", "export", "csv", "sandbox", "datab", "sql"]) }
@@ -2441,7 +2490,9 @@
         duration: diagnosticPackage.duration,
         roles: calculateRoles().involve.filter((role) => ["PM", "Analyst", "Backend", "Security", "AI/Data", "DevOps"].includes(role)).join(" + ") || "PM + Analyst",
         output: diagnosticPackage.outputs.join("; "),
-        clientInputs: "Procesní data, přístupy/API dokumentace, vlastník dat, rozhodovatel a omezení compliance."
+        clientInputs: state.selectedAreas.includes("data_intake")
+          ? "Procesní popis, vzorek dat, vlastník dat, business cíl, anti-goals, omezení compliance."
+          : "Procesní data, přístupy/API dokumentace, vlastník dat, rozhodovatel a omezení compliance."
       };
     }
 
@@ -2504,7 +2555,7 @@
       if (!state.meetingContext.attendees) missing.push("Doplnit účastníky schůzky a role u klienta.");
       if (!state.meetingContext.meetingGoal) missing.push("Doplnit očekávaný výstup schůzky.");
       if (!state.decisionMap.economicBuyer) missing.push("Doplnit ekonomického buyera.");
-      if (!state.decisionMap.technicalBuyer && ["backend", "integration", "ai", "devops", "security", "maintenance"].some((id) => state.selectedAreas.includes(id))) {
+      if (!state.decisionMap.technicalBuyer && ["backend", "integration", "ai", "devops", "security", "maintenance", "data_intake"].some((id) => state.selectedAreas.includes(id))) {
         missing.push("Doplnit technického buyera nebo IT kontakt.");
       }
       if (!state.impact.currentPain) missing.push("Doplnit popis provozní bolesti.");
@@ -2520,6 +2571,14 @@
       }
       if (state.selectedAreas.includes("maintenance") && !state.diagnostics.maintenance?.answers?.system) {
         missing.push("Doplnit systém k převzetí, repozitář, přístupy, dokumentaci a historii incidentů.");
+      }
+      if (state.selectedAreas.includes("data_intake")) {
+        const answers = state.diagnostics.data_intake?.answers || {};
+        if (!answers.dataSample) missing.push("Doplnit Vstupní data: vzorek dat klienta.");
+        if (!answers.dataOwner) missing.push("Doplnit Vstupní data: vlastník dat a schválení použití.");
+        if (!answers.businessGoal) missing.push("Doplnit Vstupní data: proč to klient chce a jaký je cílový výstup.");
+        if (!answers.antiGoals) missing.push("Doplnit Vstupní data: anti-goals, tedy co řešení dělat nemá.");
+        if (!answers.cleanupScope) missing.push("Doplnit Vstupní data: rozsah třídění, čištění nebo mapování.");
       }
       state.selectedAreas.forEach((id) => {
         const area = areaById(id);
@@ -2565,7 +2624,7 @@
         appliedRules.push("Jednoduchý web/UX bez integrací: povolená rychlá nabídka po krátkém discovery.");
       }
       if (dataReadiness.applicable && dataReadiness.score < 70) {
-        appliedRules.push("Data/API nejsou připravené: před nabídkou ověřit dostupnost, vlastníka, kvalitu a právní titul.");
+        appliedRules.push("Data/API nejsou připravené: před nabídkou ověřit dostupnost, vlastníka, kvalitu, cíl, anti-goals a právní titul.");
       }
       if (risks.length) {
         appliedRules.push("Existují rizika z intake: neslibovat závaznou cenu bez ověření.");
@@ -2614,8 +2673,8 @@
       const hasOperationsLanguage = textContains(segmentText, [
         "smb", "provoz", "výro", "vyro", "servis", "logistik", "sklad", "administrativ", "účet", "ucet", "b2b", "služ", "sluz"
       ]);
-      const hasManualProcess = state.selectedAreas.some((id) => ["automation", "integration", "internal", "maintenance"].includes(id))
-        || state.selectedSignals.some((id) => ["manual_process", "data_retyping", "systems_to_connect", "takeover"].includes(id))
+      const hasManualProcess = state.selectedAreas.some((id) => ["automation", "integration", "internal", "maintenance", "data_intake"].includes(id))
+        || state.selectedSignals.some((id) => ["manual_process", "data_retyping", "systems_to_connect", "takeover", "client_data_work"].includes(id))
         || textContains(segmentText, ["excel", "e-mail", "email", "papír", "papir", "ručně", "rucne", "přepis", "prepis", "schval"]);
       const hasBuyer = state.bant.decisionMakerAccess === true || Boolean(state.decisionMap.economicBuyer);
       const budgetFit = state.bant.budget !== "<100k" || hasStrategicException();
@@ -2634,7 +2693,7 @@
           : { label: "Nízký ICP fit", className: "danger" };
       const outboundSegment = hasOperationsLanguage ? gtmStrategy.primaryIcp : "Mimo primární SMB provoz";
       const recommendedSalesAsset = nextStep.type === "paid_diagnostic"
-        ? "Fáze 0 one-pager + procesní ROI kalkulace"
+        ? state.selectedAreas.includes("data_intake") ? "Fáze 0 one-pager + datový checklist" : "Fáze 0 one-pager + procesní ROI kalkulace"
         : nextStep.type === "quick_offer"
           ? "Krátký scope checklist + zúžená nabídka"
           : nextStep.type === "nurturing"
@@ -2695,7 +2754,7 @@
         {
           type: "paid_diagnostic",
           label: "Placená diagnostika",
-          detail: technicalDiagnostic ? `${diagnosticPackage.name}, ${diagnosticPackage.price}, ${diagnosticPackage.duration}.` : "Použít pro automatizaci, integrace, AI, interní systém, DevOps, security nebo převzetí systému.",
+          detail: technicalDiagnostic ? `${diagnosticPackage.name}, ${diagnosticPackage.price}, ${diagnosticPackage.duration}.` : "Použít pro automatizaci, integrace, AI, vstupní data, interní systém, DevOps, security nebo převzetí systému.",
           available: technicalDiagnostic
         },
         {
@@ -2917,6 +2976,12 @@
       const assignmentText = teamAssignments.length
         ? teamAssignments.map((item) => `- ${item.role}: ${item.owner} - ${item.responsibility}`).join("\n")
         : "- Zatím není koho zapojit.";
+      const invoiceChecklistText = phaseZero.price
+        ? [
+          `- Pravidlo: ${phaseZeroInvoiceChecklist.rule}`,
+          ...phaseZeroInvoiceChecklist.checks.map((item) => `- ${item}`)
+        ].join("\n")
+        : "- Není relevantní, pokud další krok není placená Fáze 0.";
       const businessRuleText = calculateBusinessRulesApplied(score, risks, impact, dataReadiness, nextStep)
         .appliedRules
         .map((rule) => `- ${rule}`)
@@ -2926,7 +2991,7 @@
         nurturing: "V tuto chvíli dává největší smysl držet lehký follow-up, doplnit business dopad a vrátit se k projektu, až bude jasnější rozpočet nebo priorita.",
         missing_inputs: "Před návrhem dalšího kroku potřebujeme doplnit několik vstupů, aby tým nepracoval s domněnkami.",
         discovery: "Navrhujeme navazující discovery, kde ověříme scope, role, rizika a připravíme podklady pro nabídku.",
-        paid_diagnostic: `Navrhujeme nepřipravovat závaznou cenu bez ověření rozsahu. Další smysluplný krok je ${diagnosticPackage.name} (${diagnosticPackage.price}, ${diagnosticPackage.duration}), kde ověříme proces, technické vstupy, rizika a doporučíme nejkratší cestu k měřitelnému výsledku.`,
+        paid_diagnostic: `Navrhujeme nepřipravovat závaznou cenu bez ověření rozsahu. Další smysluplný krok je ${diagnosticPackage.name} (${diagnosticPackage.price}, ${diagnosticPackage.duration}), kde budeme pracovat s procesem, potřebnými daty, technickými vstupy a riziky; výstupem bude doporučení nejkratší cesty k měřitelnému výsledku.`,
         stop: "V aktuální podobě nedoporučujeme otevírat projekt ani placenou diagnostiku. Důvodem je nízký rozpočet, slabý business case nebo nefit vůči minimální velikosti zakázky."
       }[nextStep.type] || nextStep.detail;
 
@@ -2974,6 +3039,9 @@
         "",
         "Chybějící vstupy:",
         missingText,
+        "",
+        "Interní fakturační checklist Fáze 0:",
+        invoiceChecklistText,
         "",
         "Další krok:",
         nextStep.detail
@@ -3060,6 +3128,9 @@
         `- Výstup: ${phaseZero.output}`,
         `- Klient dodá: ${phaseZero.clientInputs}`,
         "",
+        "## Interní fakturační checklist Fáze 0",
+        invoiceChecklistText,
+        "",
         "## Doporučený další krok",
         `${nextStep.label}: ${nextStep.detail}`
       ].join("\n");
@@ -3100,6 +3171,9 @@
         "",
         "## Chybějící vstupy",
         missingText,
+        "",
+        "## Interní fakturační checklist Fáze 0",
+        invoiceChecklistText,
         "",
         "## Velios obchodní pravidla",
         businessRuleText
@@ -3143,7 +3217,7 @@
 
     function clientNextStepDetail(nextStep) {
       if (nextStep.type === "paid_diagnostic") {
-        return `Doporučujeme ${diagnosticPackage.name}. Během ${diagnosticPackage.duration} ověříme proces, napojení na systémy, potřebná data a připravíme návrh první realizační fáze.`;
+        return `Doporučujeme ${diagnosticPackage.name}. Během ${diagnosticPackage.duration} budeme pracovat s vaším procesem, potřebnými daty, napojením na systémy a připravíme návrh první realizační fáze.`;
       }
       if (nextStep.type === "quick_offer") {
         return "Doporučujeme krátce potvrdit rozsah a připravit zúženou nabídku.";
@@ -3200,7 +3274,7 @@
         .filter((risk) => risk.level >= 2)
         .map((risk) => `- ${risk.label}: ${risk.action}`);
       if (dataReadiness.score < 70 && dataReadiness.checks.length) {
-        lines.push("- Data: potvrdit dostupnost, vlastníka, kvalitu, právní titul a API/export.");
+        lines.push("- Data: potvrdit dostupnost, vlastníka, cíl, anti-goals, kvalitu, právní titul a API/export.");
       }
       if (!lines.length) lines.push("- Upřesnit scope, prioritu a měření návratnosti před návrhem řešení.");
       return lines.join("\n");
@@ -3213,6 +3287,7 @@
       if (state.selectedAreas.includes("devops")) questions.push("- Hosting, monitoring, zálohy, RTO/RPO, CI/CD a incident proces.");
       if (state.selectedAreas.includes("security")) questions.push("- Typ dat, právní požadavky, role, audit, DPA a bezpečnostní pravidla klienta.");
       if (state.selectedAreas.includes("ai")) questions.push("- Kvalita a dostupnost dat, metrika úspěchu a human-in-the-loop kontrola.");
+      if (state.selectedAreas.includes("data_intake")) questions.push("- Vzorek dat, vlastník dat, cíl, anti-goals a rozsah třídění, čištění nebo mapování.");
       if (state.selectedAreas.includes("maintenance")) questions.push("- Repozitář, dokumentace, přístupy, historie incidentů a backlog.");
       if (questions.length === 0) questions.push("- Zpřesnit scope první fáze a otevřené technické předpoklady.");
       return questions.join("\n");
@@ -3810,6 +3885,7 @@
             <p>${phaseZero.price ? `<strong>Cena:</strong> ${escapeHtml(phaseZero.price)} | ` : ""}<strong>Délka:</strong> ${escapeHtml(phaseZero.duration)} | <strong>Role:</strong> ${escapeHtml(phaseZero.roles)}</p>
             <p><strong>Výstup:</strong> ${escapeHtml(phaseZero.output)}</p>
             <p><strong>Klient dodá:</strong> ${escapeHtml(phaseZero.clientInputs)}</p>
+            ${phaseZero.price ? `<p><strong>${escapeHtml(phaseZeroInvoiceChecklist.title)}:</strong> ${escapeHtml(phaseZeroInvoiceChecklist.rule)}</p>` : ""}
           </div>
 
           <div>
@@ -4390,6 +4466,15 @@
         ],
         redFlags: ["Klient chce AI bez dat.", "Není metrika úspěchu.", "Výstup má rozhodovat bez lidské kontroly."]
       },
+      data_intake: {
+        title: "Vstupní data a procesní analýza",
+        script: "Tady odděluju basic kvalifikaci od placené práce s daty. Jaká data dodáte, proč je chcete řešit, co je cílem a co řešení dělat nemá?",
+        bullets: [
+          "Vyžádej vzorek dat, vlastníka dat, cíl analýzy a anti-goals.",
+          "Jakmile je potřeba data třídit, čistit nebo mapovat déle než krátký vzorek, navrhni placenou Fázi 0."
+        ],
+        redFlags: ["Klient chce závěr nad daty zdarma.", "Chybí vlastník dat.", "Není jasné, co analýza nemá dělat."]
+      },
       devops: {
         title: "Cloud / DevOps",
         script: "Provozní část potřebuje čísla. Jaká dostupnost je nutná, kdo řeší incidenty a jak rychle se musí systém obnovit?",
@@ -4491,6 +4576,7 @@
         ["Ruční přepis", "Automatizace / Interní systém"],
         ["Více systémů", "API / Integrace"],
         ["Nekvalitní data", "AI / Data"],
+        ["Klientská data k třídění", "Vstupní data / Fáze 0"],
         ["Citlivá data", "Security / Compliance"],
         ["Výpadky", "DevOps / Maintenance"],
         ["Terénní práce", "Mobilní aplikace"],
